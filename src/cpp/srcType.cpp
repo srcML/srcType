@@ -20,6 +20,7 @@
 
 #include <srcTypeHandler.hpp>
 #include <srcSAXController.hpp>
+#include <iostream>
 /**
  * main
  * @param argc number of arguments
