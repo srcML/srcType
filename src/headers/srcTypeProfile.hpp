@@ -1,14 +1,13 @@
+#ifndef INCLUDED_SRCTYPEPROFILE_HPP
+#define INCLUDED_SRCTYPEPROFILE_HPP
+
 #include <unordered_map>
 #include <string>
-
-struct FunctionProfile{
-	public:
-		std::string name;
-		std::string returnType;
-		std::string namespacename;
-};
+struct NameProfile;
+struct FunctionProfile;
+typedef std::unordered_map<std::string, NameProfile> VarTypeMap;
+typedef std::unordered_map<std::string, FunctionProfile> FunctionVarMap;
 struct NameProfile{
-	public:
 		int linenumber;
 		short int category;
 		std::string type;
@@ -16,12 +15,15 @@ struct NameProfile{
 		std::string namespacename;
 		bool classMember;
 };
-struct FunctionProfileHash {
-public:
-  std::size_t operator()(const FunctionProfile& x) const
-  {
-    return std::hash<std::string>()(x.namespacename + x.name); //TODO: This doesn't seem like it should work well
-  }
+struct FunctionProfile{
+		std::string name;
+		std::string fnNamespace;
+		std::string returnType;
+		std::string returnTypeNamespace;
+		VarTypeMap vtMap;
+};
+struct TypeDictionary{
+	FunctionVarMap fvMap;
 };
 
-typedef std::unordered_map<FunctionProfile, NameProfile, FunctionProfileHash> TypeNameMap;
+#endif

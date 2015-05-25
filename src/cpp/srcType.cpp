@@ -46,5 +46,6 @@ int main(int argc, char * argv[]) {
   srcSAXController control(argv[1]);
   srcTypeHandler handler;
   control.parse(&handler);
+  std::cerr<<"Output: "<<handler.tDict.fvMap.size();
   return 0;
 }
