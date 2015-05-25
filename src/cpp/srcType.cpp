@@ -35,13 +35,13 @@
   statement #
   Consider output to srcML
   */
+std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map;
+std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map2;
 int main(int argc, char * argv[]) {
 
   if(argc < 2) {
-
     std::cerr << "Useage: element_count input_file.xml\n";
     exit(1);
-
   }
   srcSAXController control(argv[1]);
   srcTypeHandler handler;
