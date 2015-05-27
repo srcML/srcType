@@ -74,7 +74,7 @@ class srcTypeHandler : public srcSAXHandler {
     void GetParamTypeNamespace();
 
     srcTypeHandler(){
-            fvmIt = tDict.fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
+            //fvmIt = tDict.fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
             triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
             attributeFound = false;
             process_map = {
@@ -192,8 +192,11 @@ class srcTypeHandler : public srcSAXHandler {
             };
             process_map2 = {
                 {"decl_stmt", [this](){
-                    vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
-                    //currentNameProfile.clear();
+                    //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                    if(!currentNameProfile.name.empty()){
+                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                    }
+                    currentNameProfile.clear();
                     --triggerField[decl_stmt];
                 } },             
                 { "expr_stmt", [this](){
@@ -231,6 +234,8 @@ class srcTypeHandler : public srcSAXHandler {
                     if(triggerField[function]){
                         GetFunctionName(); //split into functions for param, return and paramtype or something
                     }
+                    fvmIt->second = currentFunctionProfile;
+                    currentFunctionProfile.clear();
                     --triggerField[function];
                 } },
                 { "constructor", [this](){
@@ -256,8 +261,10 @@ class srcTypeHandler : public srcSAXHandler {
                     if(triggerField[parameter_list] && triggerField[param] && !(triggerField[type] || triggerField[block] || triggerField[templates])){
                         GetParamName();
                     }
-                    vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
-                    //currentNameProfile.clear();
+                    if(!currentNameProfile.name.empty()){
+                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                    }
+                    currentNameProfile.clear();
                     --triggerField[param];
                 } },    
                 { "member_list", [this](){
