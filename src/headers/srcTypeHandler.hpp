@@ -48,6 +48,8 @@ class srcTypeHandler : public srcSAXHandler {
     NameLineNumberPair currentFunctionBody;
     NameLineNumberPair currentFunctionReturnType;
 
+    NameLineNumberPair currentConstructor;
+
     NameProfile currentNameProfile;
     FunctionProfile currentFunctionProfile;
     
@@ -56,6 +58,9 @@ class srcTypeHandler : public srcSAXHandler {
     FunctionVarMap::iterator fvmIt;
     
     bool attributeFound;
+
+    unsigned int lineNum;
+    unsigned int constructorNum;
 
     static std::unordered_map< std::string, std::function<void()>> process_map;
     static std::unordered_map< std::string, std::function<void()>> process_map2;
@@ -69,6 +74,9 @@ class srcTypeHandler : public srcSAXHandler {
     void GetFunctionName();
     void GetFunctionNameResolution();
     
+    void GetConstructorNameResolution();
+    void GetConstructorName();
+
     void GetParamName();
     void GetParamType();
     void GetParamTypeNamespace();
@@ -77,6 +85,8 @@ class srcTypeHandler : public srcSAXHandler {
             //fvmIt = tDict.fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
             triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
             attributeFound = false;
+            lineNum = 0;
+            constructorNum = 0;
             process_map = {
                 {"decl_stmt", [this](){
                     ++triggerField[decl_stmt];
@@ -158,10 +168,16 @@ class srcTypeHandler : public srcSAXHandler {
                     if(triggerField[function] && !(triggerField[block] || triggerField[templates] || triggerField[parameter_list] || triggerField[type] || triggerField[argument_list])){
                         GetFunctionNameResolution();
                     }
+                    if(triggerField[constructor] && !(triggerField[block] || triggerField[templates] || triggerField[parameter_list] || triggerField[type] || triggerField[argument_list])){
+                        GetConstructorNameResolution();
+                    }
                 } },
                 { "block", [this](){ 
                     if(triggerField[function] & !triggerField[block]){
                         fvmIt = tDict.fvMap.insert(std::make_pair(currentFunctionBody.first, FunctionProfile())).first;
+                    }else if(triggerField[constructor] & !triggerField[block]){
+                        fvmIt = tDict.fvMap.insert(std::make_pair(currentConstructor.first+std::to_string(constructorNum), FunctionProfile())).first;
+                        ++constructorNum;
                     }
                     ++triggerField[block];
                 } },
@@ -175,6 +191,7 @@ class srcTypeHandler : public srcSAXHandler {
                     ++triggerField[literal];
                 } },
                 { "modifier", [this](){
+                    currentNameProfile.alias = true;
                     ++triggerField[modifier];
                 } },
                 { "decl", [this](){
@@ -234,11 +251,17 @@ class srcTypeHandler : public srcSAXHandler {
                     if(triggerField[function]){
                         GetFunctionName(); //split into functions for param, return and paramtype or something
                     }
-                    fvmIt->second = currentFunctionProfile;
+                    fvmIt->second += currentFunctionProfile;
                     currentFunctionProfile.clear();
                     --triggerField[function];
                 } },
                 { "constructor", [this](){
+                    //Get Function name at the end of a function. Means we can't assume we have it stored until function closes.
+                    if(triggerField[constructor]){
+                        GetConstructorName(); //split into functions for param, return and paramtype or something
+                    }
+                    fvmIt->second = currentFunctionProfile;
+                    currentFunctionProfile.clear();
                     --triggerField[constructor];
                 } },            
                 { "destructor", [this](){
@@ -388,6 +411,9 @@ class srcTypeHandler : public srcSAXHandler {
     virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                 int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                 const struct srcsax_attribute * attributes) {
+            if(num_attributes){
+                lineNum = strtoul(attributes[0].value, NULL, 0);
+            }
             std::string lname(localname);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(lname);
             if (process != process_map.end()){
@@ -416,11 +442,11 @@ class srcTypeHandler : public srcSAXHandler {
         if((triggerField[type] && triggerField[decl_stmt] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]))){
             currentDeclType.first.append(ch,len);
         }
-        if(((triggerField[function] || triggerField[functiondecl]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param])
+        if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param])
             && !(triggerField[type] || triggerField[templates] || triggerField[argument_list])){
             currentParam.first.append(ch, len);
         }
-        if(((triggerField[function] || triggerField[functiondecl]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param]) && triggerField[type]
+        if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param]) && triggerField[type]
          && !(triggerField[templates] || triggerField[op] || triggerField[argument_list_template])){
             currentParamType.first.append(ch, len);
         }
@@ -429,6 +455,12 @@ class srcTypeHandler : public srcSAXHandler {
          || triggerField[parameter_list] || triggerField[index] || triggerField[preproc] || triggerField[op])){
             
             currentFunctionBody.first.append(ch, len);
+        }
+        if((triggerField[constructor] && triggerField[name]) 
+         && !(triggerField[argument_list] || triggerField[argument_list_template] || triggerField[block] || triggerField[type]
+         || triggerField[parameter_list] || triggerField[index] || triggerField[preproc] || triggerField[op])){
+            
+            currentConstructor.first.append(ch, len);
         }
         if(triggerField[function] && triggerField[type] 
             && !(triggerField[op] || triggerField[block] || triggerField[argument_list] || triggerField[argument_list_template] || triggerField[templates] || triggerField[parameter_list])){
