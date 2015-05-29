@@ -62,6 +62,8 @@ std::string SerializeMapToString(FunctionVarMap::const_iterator pr){
   }
   if(str[str.size()-1] != '{'){
     str.erase(str.size()-1);
+  }else{
+    str=str+"{}";//corner case, fix better later. Basically if the nameprofile is empty I need to nest an init list in an init list to fix. Like {{}}
   }
   str=str+"})";
   return str;
