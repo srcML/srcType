@@ -440,6 +440,13 @@ class srcTypeHandler : public srcSAXHandler {
                 lineNum = strtoul(attributes[0].value, NULL, 0);
             }
             std::string lname(localname);
+            std::string lnspace;
+            if(prefix){
+                lnspace.append(prefix);
+            }
+            if(lnspace == "cpp"){
+                ++triggerField[preproc];
+            }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(lname);
             if (process != process_map.end()){
                 if(num_attributes && std::string(attributes[0].value) == "template"){
@@ -464,15 +471,15 @@ class srcTypeHandler : public srcSAXHandler {
             || triggerField[index] || triggerField[preproc] || triggerField[type] || triggerField[init] || triggerField[macro])) {
             currentDecl.first.append(ch,len);
         }
-        if((triggerField[type] && triggerField[decl_stmt] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]|| triggerField[macro]))){
+        if((triggerField[type] && triggerField[decl_stmt] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]|| triggerField[macro] || triggerField[preproc]))){
             currentDeclType.first.append(ch,len);
         }
         if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param])
-            && !(triggerField[type] || triggerField[templates] || triggerField[argument_list]|| triggerField[macro])){
+            && !(triggerField[type] || triggerField[templates] || triggerField[argument_list]|| triggerField[macro] || triggerField[preproc])){
             currentParam.first.append(ch, len);
         }
         if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param]) && triggerField[type]
-         && !(triggerField[templates] || triggerField[op] || triggerField[argument_list_template] || triggerField[macro])){
+         && !(triggerField[templates] || triggerField[op] || triggerField[argument_list_template] || triggerField[macro] || triggerField[preproc])){
             currentParamType.first.append(ch, len);
         }
         if((triggerField[function] && triggerField[name]) 
@@ -488,7 +495,7 @@ class srcTypeHandler : public srcSAXHandler {
             currentConstructor.first.append(ch, len);
         }
         if(triggerField[function] && triggerField[type] 
-            && !(triggerField[op] || triggerField[functionblock] || triggerField[argument_list] || triggerField[argument_list_template] || triggerField[templates] || triggerField[parameter_list]|| triggerField[macro])){
+            && !(triggerField[op] || triggerField[functionblock] || triggerField[argument_list] || triggerField[argument_list_template] || triggerField[templates] || triggerField[parameter_list]|| triggerField[macro] || triggerField[preproc])){
             currentFunctionReturnType.first.append(ch, len);
         }
     }
@@ -503,6 +510,20 @@ class srcTypeHandler : public srcSAXHandler {
 
     virtual void endElement(const char * localname, const char * prefix, const char * URI) {
         std::string lname(localname);
+        std::string lnspace;
+        if(prefix){
+            lnspace.append(prefix);
+        }
+        if(lnspace == "cpp"){
+            currentFunctionBody.first.clear();
+            currentDecl.first.clear();
+            currentDeclType.first.clear();
+            currentParamType.first.clear();
+            currentParam.first.clear();
+            currentConstructor.first.clear();
+            currentFunctionReturnType.first.clear();
+            --triggerField[preproc];
+        }
         std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(lname);            
         if (process2 != process_map2.end()) {
             process2->second();
