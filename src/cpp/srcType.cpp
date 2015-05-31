@@ -29,65 +29,6 @@
  * Invoke srcSAX handler to count element occurences and print out the resulting element counts.
  */ 
 
- std::string OutputQuotedString(std::string str){
-  return "\""+str+"\"";
- }
- std::string ConstructNameProfileCall(int linenumber, short int category, std::string type, std::string name, std::string namespacename, bool classMember, bool alias){
-    return "NameProfile("+OutputQuotedString(std::to_string(linenumber))+","+OutputQuotedString(std::to_string(category))+","+OutputQuotedString(type)+","+OutputQuotedString(name)+","+OutputQuotedString(namespacename)+","+OutputQuotedString(std::to_string(classMember))+","+OutputQuotedString(std::to_string(alias))+")";
- }
- std::string ConstructFunctionProfileCall(std::string name, std::string fnNamespace, std::string returnType, std::string returnTypeNamespace){
-    return "FunctionProfile("+OutputQuotedString(name)+","+OutputQuotedString(fnNamespace)+","+OutputQuotedString(returnType)+","+OutputQuotedString(returnTypeNamespace)+",";
- }
- template <typename T>
- std::string SerializeMapToString(T mp){
-    std::string str;
-    str=str+"{";
-    for(typename T::const_iterator fvmIt = mp.begin(); fvmIt != mp.end(); ++fvmIt){
-      str=str+"{"+OutputQuotedString(fvmIt->first)+","+SerializeMapToString(fvmIt)+"},"+"\n";
-    }
-    if(str[str.size()-2] != '{'){
-      str.erase(str.size()-2);
-    }
-    str=str+"};";
-    return str;
- }
-std::string SerializeMapToString(VarTypeMap::const_iterator pr){
-  return ConstructNameProfileCall(pr->second.linenumber,pr->second.category,pr->second.type,pr->second.name,pr->second.namespacename,pr->second.classMember,pr->second.alias);
-}
-std::string SerializeMapToString(FunctionVarMap::const_iterator pr){
-  std::string str = ConstructFunctionProfileCall(pr->second.name,pr->second.fnNamespace,pr->second.returnType,pr->second.returnTypeNamespace);
-  str = str+"{";
-  for(VarTypeMap::const_iterator p = pr->second.vtMap.begin(); p!=pr->second.vtMap.end(); ++p){
-      str = str+"\n{"+OutputQuotedString(p->first)+","+SerializeMapToString(p)+"},";
-  }
-  if(str[str.size()-1] != '{'){
-    str.erase(str.size()-1);
-  }else{
-    str=str+"{}";//corner case, fix better later. Basically if the nameprofile is empty I need to nest an init list in an init list to fix. Like {{}}
-  }
-  str=str+"})";
-  return str;
-}
-
-void OutputDict(const srcTypeHandler& handler){
-  std::string str;
-  //auto fileNameIt = handler.sysDict.fileTable.find(ffvmIt->first);
-  //if(fileNameIt != handler.sysDict.fileTable.end())
-  for(FunctionVarMap::const_iterator fvmIt = handler.tDict.fvMap.begin(); fvmIt != handler.tDict.fvMap.end(); ++fvmIt){      
-    //std::cerr<<fvmIt->second.name+","<<std::endl;
-    for(VarTypeMap::const_iterator vmIt = fvmIt->second.vtMap.begin(); vmIt != fvmIt->second.vtMap.end(); ++vmIt){
-      std::cerr<<vmIt->second.name+","<<std::endl;
-    }
-    std::cerr<<")";
-    std::cerr<<"-------------------------"<<std::endl;
-  }
-}
-void OutputHppFile(std::string hpp, std::string mapdat){
-  std::string guard = "\n#ifndef INCLUDED_SRCTYPEPROFILE_HPP\n"
-                      "#define INCLUDED_SRCTYPEPROFILE_HPP\n";
-  std::string endguard = "\n#endif\n";
-  std::cerr<<guard<<hpp<<mapdat<<endguard;
-}
 /*
   Type Resolution tool
   Def Use Tool as separate thing (same as type res?)
@@ -95,6 +36,11 @@ void OutputHppFile(std::string hpp, std::string mapdat){
   statement #
   Consider output to srcML
   */
+std::string SerializeMapToString(FunctionVarMap mp);
+std::string Serializ(FunctionVarMap mp){
+  return SerializeMapToString(mp);
+}
+
 std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map;
 std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map2;
 int main(int argc, char * argv[]) {
@@ -106,7 +52,11 @@ int main(int argc, char * argv[]) {
   srcSAXController control(argv[1]);
   srcTypeHandler handler;
   control.parse(&handler);
-  std::string serializedMap = "FunctionVarMap srcTypeMap = "+SerializeMapToString(handler.tDict.fvMap);
-  OutputHppFile(hppfile, serializedMap);
+  //handler.tDict.SerializeMap(Serializ);
+
+  handler.tDict.SetContext("Pop");
+  auto it = handler.tDict.Find("result");
+  if(it.first == true)
+    std::cerr<<it.second->first;
   return 0;
 }

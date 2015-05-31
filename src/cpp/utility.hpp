@@ -94,4 +94,21 @@ static const std::unordered_map<std::string, PrimTypes> cppPrimTypes{
 {"bool", BOOL},
 {"double", DOUBLE},
 {"size_t", SIZE_T}};
+
 #endif
+/*
+void OutputDict(const srcTypeHandler& handler){
+  std::string str;
+  //auto fileNameIt = handler.sysDict.fileTable.find(ffvmIt->first);
+  //if(fileNameIt != handler.sysDict.fileTable.end())
+  for(FunctionVarMap::const_iterator fvmIt = handler.tDict.fvMap.begin(); fvmIt != handler.tDict.fvMap.end(); ++fvmIt){      
+    //std::cerr<<fvmIt->second.name+","<<std::endl;
+    for(VarTypeMap::const_iterator vmIt = fvmIt->second.vtMap.begin(); vmIt != fvmIt->second.vtMap.end(); ++vmIt){
+      std::cerr<<vmIt->second.name+","<<std::endl;
+    }
+    std::cerr<<")";
+    std::cerr<<"-------------------------"<<std::endl;
+  }
+}
+
+*/

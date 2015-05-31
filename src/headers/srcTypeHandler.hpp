@@ -173,12 +173,15 @@ class srcTypeHandler : public srcSAXHandler {
                     }
                 } },
                 { "block", [this](){ 
-                    if(triggerField[function] & !triggerField[functionblock]){
-                        fvmIt = tDict.fvMap.insert(std::make_pair(currentFunctionBody.first, FunctionProfile())).first;
-                    }else if(triggerField[constructor] & !triggerField[functionblock]){
-                        fvmIt = tDict.fvMap.insert(std::make_pair(currentConstructor.first+std::to_string(constructorNum), FunctionProfile())).first;
-                        ++constructorNum;
+                    if(!(triggerField[functionblock] || currentFunctionBody.first.empty())){
+                        if(triggerField[function]){
+                            fvmIt = tDict.fvMap.insert(std::make_pair(currentFunctionBody.first, FunctionProfile())).first;
+                        }else if(triggerField[constructor]){
+                            fvmIt = tDict.fvMap.insert(std::make_pair(currentConstructor.first+std::to_string(constructorNum), FunctionProfile())).first;
+                            ++constructorNum;
+                        }
                     }
+
                     if((triggerField[function] || triggerField[constructor]) && !triggerField[classn]){
                         ++triggerField[functionblock];
                     }else if(triggerField[classn]){
@@ -472,7 +475,7 @@ class srcTypeHandler : public srcSAXHandler {
             currentDecl.first.append(ch,len);
         }
         if((triggerField[type] && triggerField[decl_stmt] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]|| triggerField[macro] || triggerField[preproc]))){
-            currentDeclType.first.append(ch,len);
+            currentDeclType.first = std::string(ch,len);
         }
         if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param])
             && !(triggerField[type] || triggerField[templates] || triggerField[argument_list]|| triggerField[macro] || triggerField[preproc])){
@@ -480,7 +483,7 @@ class srcTypeHandler : public srcSAXHandler {
         }
         if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param]) && triggerField[type]
          && !(triggerField[templates] || triggerField[op] || triggerField[argument_list_template] || triggerField[macro] || triggerField[preproc])){
-            currentParamType.first.append(ch, len);
+            currentParamType.first = std::string(ch, len);
         }
         if((triggerField[function] && triggerField[name]) 
          && !(triggerField[argument_list] || triggerField[argument_list_template] || triggerField[functionblock] || triggerField[type]
@@ -496,7 +499,7 @@ class srcTypeHandler : public srcSAXHandler {
         }
         if(triggerField[function] && triggerField[type] 
             && !(triggerField[op] || triggerField[functionblock] || triggerField[argument_list] || triggerField[argument_list_template] || triggerField[templates] || triggerField[parameter_list]|| triggerField[macro] || triggerField[preproc])){
-            currentFunctionReturnType.first.append(ch, len);
+            currentFunctionReturnType.first = std::string(ch, len);
         }
     }
 
