@@ -54,9 +54,9 @@ int main(int argc, char * argv[]) {
   control.parse(&handler);
   //handler.tDict.SerializeMap(Serializ);
 
-  handler.tDict.SetContext("Pop");
+  handler.tDict.SetContext("Pop", 1);
   auto it = handler.tDict.Find("result");
   if(it.first == true)
-    std::cerr<<it.second->first;
+    std::cerr<<it.second.name;
   return 0;
 }

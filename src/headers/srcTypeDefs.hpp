@@ -2,8 +2,8 @@
 #define SRCTYPEDEFS_HPP
 struct NameProfile;
 struct FunctionProfile;
-typedef std::map<std::string, NameProfile> VarTypeMap;
-typedef std::map<std::string, FunctionProfile> FunctionVarMap;
+typedef std::unordered_map<std::string, NameProfile> VarTypeMap;
+typedef std::unordered_map<std::string, FunctionProfile> FunctionVarMap;
 
 struct NameProfile{
   int linenumber;

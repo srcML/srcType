@@ -225,7 +225,7 @@ class srcTypeHandler : public srcSAXHandler {
                 {"decl_stmt", [this](){
                     //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
                     if(!currentNameProfile.name.empty()){
-                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
                     }
                     currentNameProfile.clear();
                     --triggerField[decl_stmt];
@@ -299,7 +299,7 @@ class srcTypeHandler : public srcSAXHandler {
                         GetParamName();
                     }
                     if(!currentNameProfile.name.empty()){
-                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                        vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
                     }
                     currentNameProfile.clear();
                     --triggerField[param];
