@@ -3,6 +3,6 @@ file(GLOB SRCSAXHANDLER_INCLUDE ../../srcSAX/src/srcsax/*.h* ../../srcSAX/src/cp
 file(GLOB SRCTYPEHANDLER_SOURCE cpp/*.cpp)
 file(GLOB SRCTYPEHANDLER_INCLUDE headers/*.hpp)
 
-add_library(srcType ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE})
+add_library(srctype ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE})
 
-target_link_libraries(srcType srcsax ${LIBXML2_LIBRARIES})
+target_link_libraries(srctype srcsax ${LIBXML2_LIBRARIES})

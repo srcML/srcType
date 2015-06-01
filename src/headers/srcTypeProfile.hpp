@@ -7,7 +7,7 @@
 #include <exception>
 #include <functional>
 #include <iostream>
-
+namespace srctypens{
 class srcTypeHandler;
 struct NameProfile;
 struct FunctionProfile;
@@ -107,6 +107,7 @@ class TypeDictionary{
             }
             return false;
         }
+        int Size()const {return fvMap.size();}
         //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
         std::pair<bool, NameProfile> Find(std::string funcname, std::string varname, int lineNumber)const{
             FunctionVarMap::const_iterator fvmIt = fvMap.find(funcname);
@@ -167,4 +168,5 @@ class TypeDictionary{
         }
         friend srcTypeHandler;
 };
+}
 #endif

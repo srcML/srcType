@@ -18,6 +18,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include <srcType.hpp>
+namespace srctypens{
+srcType::srcType(){} 
 srcType::srcType(const char* filename, const char* encoding = 0){
     srcSAXController control(filename);
     srcTypeHandler handler(&dictionary);
@@ -37,4 +39,10 @@ srcType::srcType(int fd, const char* encoding = 0){
     srcSAXController control(fd);
     srcTypeHandler handler(&dictionary);
     control.parse(&handler);
+}
+void srcType::ReadArchiveFile(std::string filename){
+    srcSAXController control(filename.c_str());
+    srcTypeHandler handler(&dictionary);
+    control.parse(&handler); 
+}
 }

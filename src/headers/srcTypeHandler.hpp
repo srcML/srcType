@@ -25,12 +25,12 @@
 #include <srcTypeProfile.hpp>
 #include <functional>
 #include <iostream>
-
+namespace srctypens {
 class srcTypeHandler : public srcSAXHandler {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
     typedef std::pair<std::string, unsigned int> NameLineNumberPair;
-    public:
+    
     enum ParserState {decl, expr, param, decl_stmt, expr_stmt, parameter_list, 
         argument_list, argument_list_template, call, templates, ctrlflow, endflow, 
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
@@ -38,7 +38,6 @@ class srcTypeHandler : public srcSAXHandler {
         preproc, whileloop, forloop, ifcond, nonterminal, empty, macro, classblock, functionblock,
         specifier, MAXENUMVALUE = empty};
     
-    //TypeNameMap tnMap;
     std::vector<unsigned short int> triggerField;
 
     NameLineNumberPair currentDecl;
@@ -62,9 +61,9 @@ class srcTypeHandler : public srcSAXHandler {
     unsigned int lineNum;
     unsigned int constructorNum;
 
-    static std::unordered_map< std::string, std::function<void()>> process_map;
-    static std::unordered_map< std::string, std::function<void()>> process_map2;
-    
+    std::unordered_map< std::string, std::function<void()>> process_map;
+    std::unordered_map< std::string, std::function<void()>> process_map2;
+public:
     void GetTypeName();
     void GetDeclStmtName();
     void GetDeclStmtNamespace();
@@ -545,5 +544,5 @@ class srcTypeHandler : public srcSAXHandler {
 #pragma GCC diagnostic pop
 
 };
-
+}
 #endif

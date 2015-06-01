@@ -1,5 +1,5 @@
 #include <srcTypeHandler.hpp>
-
+namespace srctypens{
 void srcTypeHandler::GetParamTypeNamespace(){
     currentNameProfile.namespacename = currentParamType.first;
     //std::cerr<<"param type namespace: "<<currentNameProfile.namespacename<<std::endl;
@@ -79,4 +79,5 @@ void srcTypeHandler::GetDeclStmtName(){
     //std::cerr<<"decl name: "<<currentDecl.first<<std::endl;
     currentNameProfile.linenumber = currentDecl.second;
     currentDecl.first.clear();
+}
 }

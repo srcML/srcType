@@ -1,17 +1,22 @@
+#ifndef SRCTYPE_HPP
+#define SRCTYPE_HPP
+
 #include <srcTypeHandler.hpp>
 #include <srcSAXController.hpp>
 #include <iostream> 
 
-std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map;
-std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map2;
+namespace srctypens{
 class srcType{
     private:
         TypeDictionary dictionary;
     public:
+        srcType();
         srcType(const char*, const char*);
         srcType(std::string, const char*);
         srcType(FILE*, const char*);
         srcType(int, const char*);
+        void ReadArchiveFile(std::string);
+        int Size()const {return dictionary.Size();}
 };
 
 
@@ -59,3 +64,5 @@ inline void OutputHppFile(std::string hpp, std::string mapdat){
   std::string endguard = "\n#endif\n";
   std::cerr<<guard<<hpp<<mapdat<<endguard;
 }
+}
+#endif
