@@ -17,46 +17,24 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-#include <srcTypeHandler.hpp>
-#include <srcSAXController.hpp>
-#include <iostream> 
-/**
- * main
- * @param argc number of arguments
- * @param argv the provided arguments (array of C strings)
- * 
- * Invoke srcSAX handler to count element occurences and print out the resulting element counts.
- */ 
-
-/*
-  Type Resolution tool
-  Def Use Tool as separate thing (same as type res?)
-  methods
-  statement #
-  Consider output to srcML
-  */
-std::string SerializeMapToString(FunctionVarMap mp);
-std::string Serializ(FunctionVarMap mp){
-  return SerializeMapToString(mp);
+#include <srcType.hpp>
+srcType::srcType(const char* filename, const char* encoding = 0){
+    srcSAXController control(filename);
+    srcTypeHandler handler(&dictionary);
+    control.parse(&handler);
 }
-
-std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map;
-std::unordered_map<std::string, std::function<void()>> srcTypeHandler::process_map2;
-int main(int argc, char * argv[]) {
-
-  if(argc < 2) {
-    std::cerr << "Useage: element_count input_file.xml\n";
-    exit(1);
-  }
-  srcSAXController control(argv[1]);
-  srcTypeHandler handler;
-  control.parse(&handler);
-  //handler.tDict.SerializeMap(Serializ);
-
-  handler.tDict.SetContext("Pop", 1);
-  auto it = handler.tDict.Find("result");
-  if(it.first == true)
-    std::cerr<<it.second.name;
-  return 0;
+srcType::srcType(std::string buffer, const char* encoding = 0){
+    srcSAXController control(buffer);
+    srcTypeHandler handler(&dictionary);
+    control.parse(&handler);
+}
+srcType::srcType(FILE* file, const char* encoding = 0){
+    srcSAXController control(file);
+    srcTypeHandler handler(&dictionary);
+    control.parse(&handler);
+}
+srcType::srcType(int fd, const char* encoding = 0){
+    srcSAXController control(fd);
+    srcTypeHandler handler(&dictionary);
+    control.parse(&handler);
 }

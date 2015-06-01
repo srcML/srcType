@@ -53,7 +53,7 @@ class srcTypeHandler : public srcSAXHandler {
     NameProfile currentNameProfile;
     FunctionProfile currentFunctionProfile;
     
-    TypeDictionary tDict;
+    TypeDictionary* tDict;
     VarTypeMap::iterator vtmIt;
     FunctionVarMap::iterator fvmIt;
     
@@ -81,8 +81,9 @@ class srcTypeHandler : public srcSAXHandler {
     void GetParamType();
     void GetParamTypeNamespace();
 
-    srcTypeHandler(){
-            fvmIt = tDict.fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
+    srcTypeHandler(TypeDictionary* tnDict){
+            tDict = tnDict;
+            fvmIt = tDict->fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
             triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
             attributeFound = false;
             lineNum = 0;
@@ -175,9 +176,9 @@ class srcTypeHandler : public srcSAXHandler {
                 { "block", [this](){ 
                     if(!(triggerField[functionblock] || currentFunctionBody.first.empty())){
                         if(triggerField[function]){
-                            fvmIt = tDict.fvMap.insert(std::make_pair(currentFunctionBody.first, FunctionProfile())).first;
+                            fvmIt = tDict->fvMap.insert(std::make_pair(currentFunctionBody.first, FunctionProfile())).first;
                         }else if(triggerField[constructor]){
-                            fvmIt = tDict.fvMap.insert(std::make_pair(currentConstructor.first+std::to_string(constructorNum), FunctionProfile())).first;
+                            fvmIt = tDict->fvMap.insert(std::make_pair(currentConstructor.first+std::to_string(constructorNum), FunctionProfile())).first;
                             ++constructorNum;
                         }
                     }
@@ -358,6 +359,13 @@ class srcTypeHandler : public srcSAXHandler {
                     --triggerField[expr];
                 } },    
                 { "name", [this](){
+                    currentFunctionBody.second =
+                    currentDecl.second =
+                    currentDeclType.second =
+                    currentParamType.second =
+                    currentParam.second =
+                    currentConstructor.second =
+                    currentFunctionReturnType.second = lineNum;
                     --triggerField[name];
                 } },
                 { "macro", [this](){

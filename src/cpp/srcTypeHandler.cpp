@@ -3,14 +3,14 @@
 void srcTypeHandler::GetParamTypeNamespace(){
     currentNameProfile.namespacename = currentParamType.first;
     //std::cerr<<"param type namespace: "<<currentNameProfile.namespacename<<std::endl;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentParamType.second;
     currentParamType.first.clear();
 }
 void srcTypeHandler::GetParamType(){
     //Get param types
     currentNameProfile.type = currentParamType.first;
     //std::cerr<<"param type: "<<currentNameProfile.type<<std::endl;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentParamType.second;
     if(cppPrimTypes.find(currentParamType.first) != cppPrimTypes.end()){
         currentNameProfile.category = primitive;
     }else{
@@ -21,7 +21,7 @@ void srcTypeHandler::GetParamType(){
 void srcTypeHandler::GetParamName(){
     //Get Param names
     currentNameProfile.name = currentParam.first;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentParam.second;
     //std::cerr<<"param name: "<<currentParam.first<<std::endl;
     currentParam.first.clear();
 }
@@ -60,13 +60,13 @@ void srcTypeHandler::GetConstructorName(){
 void srcTypeHandler::GetDeclStmtNamespace(){
     currentNameProfile.namespacename = currentDeclType.first;
     //std::cerr<<"decl namespace: "<<currentDeclType.first<<std::endl;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentDeclType.second;
     currentDeclType.first.clear();
 }
 void srcTypeHandler::GetTypeName(){
     currentNameProfile.type = currentDeclType.first;
     //std::cerr<<"decl type: "<<currentDeclType.first<<std::endl;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentDeclType.second;
     if(cppPrimTypes.find(currentDeclType.first) != cppPrimTypes.end()){
         currentNameProfile.category = primitive;
     }else{
@@ -77,6 +77,6 @@ void srcTypeHandler::GetTypeName(){
 void srcTypeHandler::GetDeclStmtName(){
     currentNameProfile.name = currentDecl.first;
     //std::cerr<<"decl name: "<<currentDecl.first<<std::endl;
-    currentNameProfile.linenumber = lineNum;
+    currentNameProfile.linenumber = currentDecl.second;
     currentDecl.first.clear();
 }
