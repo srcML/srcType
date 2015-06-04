@@ -2,7 +2,7 @@
 #define TYPEDICTHPP
 namespace srcTypeNS{
     enum PrimTypes{INT, UINT, SIINT, SHINT, SISINT, USISINT, LINT, SLINT, USILINT, SILINT, LDOUBLE, WCHAR, CHAR, UCHAR, SCHAR, VOID, FLOAT, BOOL, DOUBLE, SIZE_T};
-    enum {primitive, userdefined};
+    enum VarCategory {primitive, userdefined};
     static const std::string hppfile =
     "\n#include <unordered_map>"
     "\n#include <string>\n"

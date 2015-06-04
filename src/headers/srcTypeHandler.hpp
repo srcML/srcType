@@ -95,11 +95,11 @@ namespace srcTypeNS {
                         ++triggerField[expr_stmt];
                     } },
                     { "parameter_list", [this](){
-                        if(triggerField[function]){
+                        if(triggerField[function] || triggerField[functiondecl]){
                             //std::cerr<<"SCTYPE: "<<currentFunctionBody.first<<std::endl;
                             GetFunctionName(); //split into functions for param, return and paramtype or something
                         }
-                        if(triggerField[constructor]){
+                        if(triggerField[constructor] || triggerField[constructordecl]){
                             //std::cerr<<"SCTYPE: "<<currentConstructor.first<<std::endl;
                             GetConstructorName(); //split into functions for param, return and paramtype or something
                         }
@@ -236,6 +236,9 @@ namespace srcTypeNS {
                         //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
                         if(!currentNameProfile.name.empty()){
                             vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
+                            if(triggerField[classn]){
+                                vtmIt->second.classMember = true;
+                            }
                         }
                         currentNameProfile.clear();
                         --triggerField[decl_stmt];
@@ -488,7 +491,7 @@ namespace srcTypeNS {
                 || triggerField[index] || triggerField[preproc] || triggerField[type] || triggerField[init] || triggerField[macro])) {
                 currentDecl.first.append(ch,len);
             }
-            if((triggerField[type] && triggerField[decl_stmt] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]|| triggerField[macro] || triggerField[preproc]))){
+            if((triggerField[type] && triggerField[decl_stmt] && triggerField[name] && !(triggerField[argument_list_template] || triggerField[modifier] || triggerField[op]|| triggerField[macro] || triggerField[preproc]))){
                 currentDeclType.first = std::string(ch,len);
             }
             if(((triggerField[function] || triggerField[functiondecl] || triggerField[constructor]) && triggerField[name]  && triggerField[parameter_list] && triggerField[param])
@@ -499,7 +502,7 @@ namespace srcTypeNS {
             && !(triggerField[templates] || triggerField[op] || triggerField[argument_list_template] || triggerField[macro] || triggerField[preproc])){
                 currentParamType.first = std::string(ch, len);
             }
-            if((triggerField[function] && triggerField[name]) 
+            if(((triggerField[function] || triggerField[functiondecl]) && triggerField[name]) 
             && !(triggerField[argument_list] || triggerField[argument_list_template] || triggerField[functionblock] || triggerField[type]
             || triggerField[parameter_list] || triggerField[index] || triggerField[preproc] || triggerField[op]|| triggerField[macro])){
                 
@@ -513,7 +516,12 @@ namespace srcTypeNS {
             }
             if(triggerField[function] && triggerField[type] 
                 && !(triggerField[op] || triggerField[functionblock] || triggerField[argument_list] || triggerField[argument_list_template] || triggerField[templates] || triggerField[parameter_list]|| triggerField[macro] || triggerField[preproc])){
-                currentFunctionReturnType.first = std::string(ch, len);
+                if(!triggerField[modifier]){
+                    currentFunctionReturnType.first = std::string(ch, len);
+                }else{
+                    currentFunctionReturnType.first.append(ch, len);
+                }
+                
             }
         }
     

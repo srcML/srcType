@@ -44,6 +44,9 @@ namespace srcTypeNS{
         //get function name
         //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
         currentFunctionProfile.name = currentFunctionBody.first;
+        if(triggerField[classn]){
+            currentFunctionProfile.isMethod = true;
+        }
         currentFunctionBody.first.clear();
     }
     void srcTypeHandler::GetConstructorNameResolution(){
