@@ -368,9 +368,6 @@ namespace srcTypeNS {
                         --triggerField[expr];
                     } },    
                     { "name", [this](){
-                        currentFunctionBody.second =
-                        currentDecl.second =
-                        currentDeclType.second =
                         currentParamType.second =
                         currentParam.second =
                         currentConstructor.second =

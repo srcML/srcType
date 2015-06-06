@@ -62,7 +62,9 @@ namespace srcTypeNS{
             srcType(int, const char*);
             void ReadArchiveFile(std::string);
             int size()const {return dictionary.fvMap.size();}
-
+            SFunctionProfile GetFunctionProfile() const{
+                return SFunctionProfile(dictionary.currentContext.currentFunc->second);
+            }
             bool SetContext(std::string fn, int linenumber){
                 FunctionVarMap::iterator it = dictionary.fvMap.find(fn);
                 if(it != dictionary.fvMap.end()){

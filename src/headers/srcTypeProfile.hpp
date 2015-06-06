@@ -7,7 +7,6 @@
 #include <exception>
 #include <functional>
 #include <iostream>
-
 namespace srcTypeNS{
     class srcTypeHandler;
     struct NameProfile;
@@ -51,7 +50,7 @@ namespace srcTypeNS{
         std::string returnTypeNamespace;
         bool isMethod;
         VarTypeMap vtMap;
-        FunctionProfile(){}
+        FunctionProfile(){isMethod = false;}
         FunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, VarTypeMap vtm)
         : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), vtMap(vtm){}
         FunctionProfile operator+=(const FunctionProfile& fp){
@@ -76,10 +75,27 @@ namespace srcTypeNS{
             name.clear();
             fnNamespace.clear();
             returnTypeNamespace.clear();
+            isMethod = false;
             vtMap.clear();
         }
     };
-    
+    struct SFunctionProfile{
+        std::string name;
+        std::string fnNamespace;
+        std::string returnType;
+        std::string returnTypeNamespace;
+        bool isMethod;
+        SFunctionProfile(){isMethod = false;}
+        SFunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)){}
+        SFunctionProfile(const FunctionProfile& fp){
+            name = fp.name;
+            fnNamespace = fp.fnNamespace;
+            returnType = fp.returnType;
+            returnTypeNamespace = fp.returnTypeNamespace;
+            isMethod = fp.isMethod;
+        }
+    };
     
     struct TypeDictionary{
         //context can be used to keep track of what function you're searching in. Makes searching faster because I assume you're using that function as the context
