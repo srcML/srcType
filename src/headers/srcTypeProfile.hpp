@@ -49,11 +49,12 @@ namespace srcTypeNS{
         std::string returnType;
         std::string returnTypeNamespace;
         bool isMethod;
+        int category;
         VarTypeMap vtMap;
         ScopeProfile(){isMethod = false;}
         ScopeProfile(std::string nm):name(nm){}
-        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, VarTypeMap vtm)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), vtMap(vtm){}
+        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, VarTypeMap vtm)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), vtMap(vtm){}
         ScopeProfile operator+=(const ScopeProfile& fp){
             if(!name.empty()){ //currently a function we've already seen
             for(auto it : fp.vtMap){
@@ -64,6 +65,7 @@ namespace srcTypeNS{
             fnNamespace = fp.fnNamespace;
             returnType = fp.returnType;
             returnTypeNamespace = fp.returnTypeNamespace;
+            category = fp.category;
             if(!isMethod){
                 isMethod = fp.isMethod;
             }
@@ -77,6 +79,7 @@ namespace srcTypeNS{
             fnNamespace.clear();
             returnTypeNamespace.clear();
             isMethod = false;
+            category = false;
             vtMap.clear();
         }
     };
@@ -86,15 +89,17 @@ namespace srcTypeNS{
         std::string returnType;
         std::string returnTypeNamespace;
         bool isMethod;
+        int category;
         SScopeProfile(){isMethod = false;}
-        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)){}
+        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat){}
         SScopeProfile(const ScopeProfile& fp){
             name = fp.name;
             fnNamespace = fp.fnNamespace;
             returnType = fp.returnType;
             returnTypeNamespace = fp.returnTypeNamespace;
             isMethod = fp.isMethod;
+            category = fp.category;
         }
     };
     

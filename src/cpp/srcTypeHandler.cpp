@@ -33,6 +33,11 @@ namespace srcTypeNS{
     void srcTypeHandler::GetFunctionReturnType(){
         //std::cerr<<"function Type: "<<currentFunctionReturnType.first<<std::endl;
         currentScopeProfile.returnType = currentFunctionReturnType.first;
+        if(cppPrimTypes.find(currentFunctionReturnType.first) != cppPrimTypes.end()){
+            currentScopeProfile.category = primitive;
+        }else{
+            currentScopeProfile.category = userdefined;
+        }
         currentFunctionReturnType.first.clear();
     }
     void srcTypeHandler::GetFunctionNameResolution(){
@@ -72,7 +77,7 @@ namespace srcTypeNS{
         }
         //std::cerr<<"decl type: "<<currentDeclType.first<<std::endl;
         currentNameProfile.linenumber = currentDeclType.second;
-        if(cppPrimTypes.find(currentDeclType.first) != cppPrimTypes.end()){
+        if(cppPrimTypes.find(currentNameProfile.type) != cppPrimTypes.end()){
             currentNameProfile.category = primitive;
         }else{
             currentNameProfile.category = userdefined;
@@ -101,7 +106,7 @@ namespace srcTypeNS{
         if(triggerField[modifier]){
             classNameProfile.alias =  true;
         }
-        cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first, classNameProfile));
+        cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first+std::to_string(lineNum), classNameProfile));
         classNameProfile.clear();
         currentDecl.first.clear();
     }
