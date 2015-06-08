@@ -13,14 +13,14 @@ namespace srcTypeNS{
     inline std::string ConstructNameProfileCall(int linenumber, short int category, std::string type, std::string name, std::string namespacename, bool classMember, bool alias){
         return "NameProfile("+OutputQuotedString(std::to_string(linenumber))+","+OutputQuotedString(std::to_string(category))+","+OutputQuotedString(type)+","+OutputQuotedString(name)+","+OutputQuotedString(namespacename)+","+OutputQuotedString(std::to_string(classMember))+","+OutputQuotedString(std::to_string(alias))+")";
     }
-    inline std::string ConstructFunctionProfileCall(std::string name, std::string fnNamespace, std::string returnType, std::string returnTypeNamespace){
-        return "FunctionProfile("+OutputQuotedString(name)+","+OutputQuotedString(fnNamespace)+","+OutputQuotedString(returnType)+","+OutputQuotedString(returnTypeNamespace)+",";
+    inline std::string ConstructScopeProfileCall(std::string name, std::string fnNamespace, std::string returnType, std::string returnTypeNamespace){
+        return "ScopeProfile("+OutputQuotedString(name)+","+OutputQuotedString(fnNamespace)+","+OutputQuotedString(returnType)+","+OutputQuotedString(returnTypeNamespace)+",";
     }
     inline std::string SerializeMapToString(VarTypeMap::const_iterator pr){
         return ConstructNameProfileCall(pr->second.linenumber,pr->second.category,pr->second.type,pr->second.name,pr->second.namespacename,pr->second.classMember,pr->second.alias);
     }
     inline std::string SerializeMapToString(FunctionVarMap::const_iterator pr){
-        std::string str = ConstructFunctionProfileCall(pr->second.name,pr->second.fnNamespace,pr->second.returnType,pr->second.returnTypeNamespace);
+        std::string str = ConstructScopeProfileCall(pr->second.name,pr->second.fnNamespace,pr->second.returnType,pr->second.returnTypeNamespace);
         str = str+"{";
         for(VarTypeMap::const_iterator p = pr->second.vtMap.begin(); p!=pr->second.vtMap.end(); ++p){
             str = str+"\n{"+OutputQuotedString(p->first)+","+SerializeMapToString(p)+"},";
@@ -62,8 +62,8 @@ namespace srcTypeNS{
             srcType(int, const char*);
             void ReadArchiveFile(std::string);
             int size()const {return dictionary.fvMap.size();}
-            SFunctionProfile GetFunctionProfile() const{
-                return SFunctionProfile(dictionary.currentContext.currentFunc->second);
+            SScopeProfile GetScopeProfile() const{
+                return SScopeProfile(dictionary.currentContext.currentFunc->second);
             }
             bool SetContext(std::string fn, int linenumber){
                 FunctionVarMap::iterator it = dictionary.fvMap.find(fn);

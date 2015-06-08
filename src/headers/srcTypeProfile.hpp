@@ -10,10 +10,10 @@
 namespace srcTypeNS{
     class srcTypeHandler;
     struct NameProfile;
-    struct FunctionProfile;
+    struct ScopeProfile;
     
     typedef std::unordered_map<std::string, NameProfile> VarTypeMap;
-    typedef std::unordered_map<std::string, FunctionProfile> FunctionVarMap;
+    typedef std::unordered_map<std::string, ScopeProfile> FunctionVarMap;
     
     struct NameProfile{
         int linenumber;
@@ -43,17 +43,18 @@ namespace srcTypeNS{
             alias = false;
         }
     };
-    struct FunctionProfile{
+    struct ScopeProfile{
         std::string name;
         std::string fnNamespace;
         std::string returnType;
         std::string returnTypeNamespace;
         bool isMethod;
         VarTypeMap vtMap;
-        FunctionProfile(){isMethod = false;}
-        FunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, VarTypeMap vtm)
+        ScopeProfile(){isMethod = false;}
+        ScopeProfile(std::string nm):name(nm){}
+        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, VarTypeMap vtm)
         : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), vtMap(vtm){}
-        FunctionProfile operator+=(const FunctionProfile& fp){
+        ScopeProfile operator+=(const ScopeProfile& fp){
             if(!name.empty()){ //currently a function we've already seen
             for(auto it : fp.vtMap){
                 vtMap.insert(it);
@@ -79,16 +80,16 @@ namespace srcTypeNS{
             vtMap.clear();
         }
     };
-    struct SFunctionProfile{
+    struct SScopeProfile{
         std::string name;
         std::string fnNamespace;
         std::string returnType;
         std::string returnTypeNamespace;
         bool isMethod;
-        SFunctionProfile(){isMethod = false;}
-        SFunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd)
+        SScopeProfile(){isMethod = false;}
+        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd)
         : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)){}
-        SFunctionProfile(const FunctionProfile& fp){
+        SScopeProfile(const ScopeProfile& fp){
             name = fp.name;
             fnNamespace = fp.fnNamespace;
             returnType = fp.returnType;

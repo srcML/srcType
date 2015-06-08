@@ -27,37 +27,37 @@ namespace srcTypeNS{
     }
     void srcTypeHandler::GetFunctionReturnTypeNamespace(){
         //std::cerr<<"function namespace: "<<currentFunctionReturnType.first<<std::endl;
-        currentFunctionProfile.returnTypeNamespace = currentFunctionReturnType.first;
+        currentScopeProfile.returnTypeNamespace = currentFunctionReturnType.first;
         currentFunctionReturnType.first.clear();
     }
     void srcTypeHandler::GetFunctionReturnType(){
         //std::cerr<<"function Type: "<<currentFunctionReturnType.first<<std::endl;
-        currentFunctionProfile.returnType = currentFunctionReturnType.first;
+        currentScopeProfile.returnType = currentFunctionReturnType.first;
         currentFunctionReturnType.first.clear();
     }
     void srcTypeHandler::GetFunctionNameResolution(){
         //std::cerr<<"function Name resultion: "<<currentFunctionBody.first<<std::endl;
-        currentFunctionProfile.fnNamespace = currentFunctionBody.first;
+        currentScopeProfile.fnNamespace = currentFunctionBody.first;
         currentFunctionBody.first.clear();
     }
     void srcTypeHandler::GetFunctionName(){
         //get function name
         //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
-        currentFunctionProfile.name = currentFunctionBody.first;
+        currentScopeProfile.name = currentFunctionBody.first;
         if(triggerField[classn]){
-            currentFunctionProfile.isMethod = true;
+            currentScopeProfile.isMethod = true;
         }
         currentFunctionBody.first.clear();
     }
     void srcTypeHandler::GetConstructorNameResolution(){
         //std::cerr<<"function Name resultion: "<<currentFunctionBody.first<<std::endl;
-        currentFunctionProfile.fnNamespace = currentConstructor.first;
+        currentScopeProfile.fnNamespace = currentConstructor.first;
         currentConstructor.first.clear();
     }
     void srcTypeHandler::GetConstructorName(){
         //get function name
         //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
-        currentFunctionProfile.name = currentConstructor.first;
+        currentScopeProfile.name = currentConstructor.first;
         currentConstructor.first.clear();
     }
     void srcTypeHandler::GetDeclStmtNamespace(){
@@ -67,7 +67,9 @@ namespace srcTypeNS{
         currentDeclType.first.clear();
     }
     void srcTypeHandler::GetTypeName(){
-        currentNameProfile.type = currentDeclType.first;
+        if(currentNameProfile.type.empty()){
+            currentNameProfile.type = currentDeclType.first;
+        }
         //std::cerr<<"decl type: "<<currentDeclType.first<<std::endl;
         currentNameProfile.linenumber = currentDeclType.second;
         if(cppPrimTypes.find(currentDeclType.first) != cppPrimTypes.end()){
@@ -83,4 +85,25 @@ namespace srcTypeNS{
         currentNameProfile.linenumber = currentDecl.second;
         currentDecl.first.clear();
     }
+    void srcTypeHandler::GetClassLevelTypeName(){
+        classNameProfile.type = currentDeclType.first;
+        if(cppPrimTypes.find(currentDeclType.first) != cppPrimTypes.end()){
+            classNameProfile.category = primitive;
+        }else{
+            classNameProfile.category = userdefined;
+        }
+        currentDeclType.first.clear();
+    }
+    void srcTypeHandler::GetClassLevelDeclName(){
+        classNameProfile.name = currentDecl.first;
+        classNameProfile.linenumber = lineNum;
+        classNameProfile.classMember = true;
+        if(triggerField[modifier]){
+            classNameProfile.alias =  true;
+        }
+        cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first, classNameProfile));
+        classNameProfile.clear();
+        currentDecl.first.clear();
+    }
+
 }
