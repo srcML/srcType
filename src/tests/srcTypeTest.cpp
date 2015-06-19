@@ -6,6 +6,6 @@ std::string SerializeToCppUMap(srcTypeNS::FunctionVarMap mp){
 int main(int argc, char** argv){
 	srcTypeNS::srcType typeDict;
 	typeDict.ReadArchiveFile(argv[1]);
-	typeDict.SerializeMap(SerializeToCppUMap);
-	std::cerr<<typeDict.size();
+	//typeDict.SerializeMap(SerializeToCppUMap);
+	//std::cerr<<typeDict.size();
 }

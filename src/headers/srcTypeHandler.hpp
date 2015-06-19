@@ -39,7 +39,9 @@ namespace srcTypeNS {
             specifier, empty, MAXENUMVALUE = empty};
         
         std::vector<unsigned short int> triggerField;
-    
+        
+        std::string currentSpecifier;
+
         NameLineNumberPair currentDecl;
         NameLineNumberPair currentDeclType;
         NameLineNumberPair currentParam;
@@ -101,6 +103,10 @@ namespace srcTypeNS {
                         ++triggerField[expr_stmt];
                     } },
                     { "parameter_list", [this](){
+                        if(currentSpecifier == "const"){
+                            currentScopeProfile.isConst = true;
+                        }
+                        currentSpecifier.clear();
                         if(triggerField[function] || triggerField[functiondecl]){
                             //std::cerr<<"SCTYPE: "<<currentFunctionBody.first<<std::endl;
                             GetFunctionName(); //split into functions for param, return and paramtype or something
@@ -240,6 +246,7 @@ namespace srcTypeNS {
                 process_map2 = {
                     {"decl_stmt", [this](){
                         //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                        currentSpecifier.clear();
                         currentNameProfile.clear();
                         --triggerField[decl_stmt];
                     } },             
@@ -323,6 +330,7 @@ namespace srcTypeNS {
                         --triggerField[op];
                     } },
                     { "block", [this](){ 
+                       currentSpecifier.clear();
                         if(triggerField[classn] && !(triggerField[function] || triggerField[constructor])){
                             --triggerField[classblock];
                         }
@@ -536,6 +544,9 @@ namespace srcTypeNS {
                     currentFunctionReturnType.first.append(ch, len);
                 }
                 
+            }
+            if(triggerField[specifier]){
+                currentSpecifier.append(ch, len);
             }
             if(triggerField[classn] && triggerField[name] && !(triggerField[classblock])){
                 cvmIt = tDict->fvMap.insert(std::make_pair(std::string(ch,len), ScopeProfile(std::string(ch,len)))).first;

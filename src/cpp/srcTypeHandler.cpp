@@ -19,6 +19,9 @@ namespace srcTypeNS{
         currentParamType.first.clear();
     }
     void srcTypeHandler::GetParamName(){
+        if(currentSpecifier == "const"){
+            currentNameProfile.isConst = true;
+        }
         //Get Param names
         currentNameProfile.name = currentParam.first;
         currentNameProfile.linenumber = currentParam.second;
@@ -32,6 +35,9 @@ namespace srcTypeNS{
     }
     void srcTypeHandler::GetFunctionReturnType(){
         //std::cerr<<"function Type: "<<currentFunctionReturnType.first<<std::endl;
+        if(currentSpecifier == "const"){
+            currentScopeProfile.hasConstReturn = true;
+        }
         currentScopeProfile.returnType = currentFunctionReturnType.first;
         if(cppPrimTypes.find(currentFunctionReturnType.first) != cppPrimTypes.end()){
             currentScopeProfile.category = primitive;
@@ -85,6 +91,9 @@ namespace srcTypeNS{
         currentDeclType.first.clear();
     }
     void srcTypeHandler::GetDeclStmtName(){
+        if(currentSpecifier == "const"){
+            currentNameProfile.isConst = true;
+        }
         currentNameProfile.name = currentDecl.first;
         //std::cerr<<"decl name: "<<currentDecl.first<<std::endl;
         currentNameProfile.linenumber = currentDecl.second;

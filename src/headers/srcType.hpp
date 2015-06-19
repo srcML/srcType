@@ -10,17 +10,17 @@ namespace srcTypeNS{
     inline std::string OutputQuotedString(std::string str){
         return "\""+str+"\"";
     }
-    inline std::string ConstructNameProfileCall(int linenumber, short int category, std::string type, std::string name, std::string namespacename, bool classMember, bool alias){
-        return "NameProfile("+OutputQuotedString(std::to_string(linenumber))+","+OutputQuotedString(std::to_string(category))+","+OutputQuotedString(type)+","+OutputQuotedString(name)+","+OutputQuotedString(namespacename)+","+OutputQuotedString(std::to_string(classMember))+","+OutputQuotedString(std::to_string(alias))+")";
+    inline std::string ConstructNameProfileCall(int linenumber, short int category, std::string type, std::string name, std::string namespacename, bool classMember, bool alias, bool isConst){
+        return "NameProfile("+OutputQuotedString(std::to_string(linenumber))+","+OutputQuotedString(std::to_string(category))+","+OutputQuotedString(type)+","+OutputQuotedString(name)+","+OutputQuotedString(namespacename)+","+OutputQuotedString(std::to_string(classMember))+","+OutputQuotedString(std::to_string(alias))+","+OutputQuotedString(std::to_string(isConst))+")";
     }
-    inline std::string ConstructScopeProfileCall(std::string name, std::string fnNamespace, std::string returnType, std::string returnTypeNamespace){
-        return "ScopeProfile("+OutputQuotedString(name)+","+OutputQuotedString(fnNamespace)+","+OutputQuotedString(returnType)+","+OutputQuotedString(returnTypeNamespace)+",";
+    inline std::string ConstructScopeProfileCall(std::string name, std::string fnNamespace, std::string returnType, std::string returnTypeNamespace, bool isConst, bool hasConstReturn){
+        return "ScopeProfile("+OutputQuotedString(name)+","+OutputQuotedString(fnNamespace)+","+OutputQuotedString(returnType)+","+OutputQuotedString(returnTypeNamespace)+","+OutputQuotedString(std::to_string(isConst))+","+OutputQuotedString(std::to_string(hasConstReturn))+",";
     }
     inline std::string SerializeMapToString(VarTypeMap::const_iterator pr){
-        return ConstructNameProfileCall(pr->second.linenumber,pr->second.category,pr->second.type,pr->second.name,pr->second.namespacename,pr->second.classMember,pr->second.alias);
+        return ConstructNameProfileCall(pr->second.linenumber,pr->second.category,pr->second.type,pr->second.name,pr->second.namespacename,pr->second.classMember,pr->second.alias, pr->second.isConst);
     }
     inline std::string SerializeMapToString(FunctionVarMap::const_iterator pr){
-        std::string str = ConstructScopeProfileCall(pr->second.name,pr->second.fnNamespace,pr->second.returnType,pr->second.returnTypeNamespace);
+        std::string str = ConstructScopeProfileCall(pr->second.name,pr->second.fnNamespace,pr->second.returnType,pr->second.returnTypeNamespace, pr->second.isConst, pr->second.hasConstReturn);
         str = str+"{";
         for(VarTypeMap::const_iterator p = pr->second.vtMap.begin(); p!=pr->second.vtMap.end(); ++p){
             str = str+"\n{"+OutputQuotedString(p->first)+","+SerializeMapToString(p)+"},";
