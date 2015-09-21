@@ -7,5 +7,7 @@ file(GLOB SRCTYPETEST_SOURCE tests/*.cpp)
 add_executable(srctypetest ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE} ${SRCTYPETEST_SOURCE})
 add_library(srctype ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE})
 
+link_directories(/usr/lib/srcml)
+
 target_link_libraries(srctype srcsax ${LIBXML2_LIBRARIES})
-target_link_libraries(srctypetest srcsax ${LIBXML2_LIBRARIES})
+target_link_libraries(srctypetest srcsax srcml ${LIBXML2_LIBRARIES})
