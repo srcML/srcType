@@ -1,8 +1,23 @@
 #include <srcType.hpp>
 #include <iostream>
 #include <srcml/srcml.h>
+#include <cassert>
 std::string SerializeToCppUMap(srcTypeNS::FunctionVarMap mp){
     return SerializeMapToString(mp);
+}
+/// <summary>
+/// Utility function that trims from the right of a string. For now it's just solving a weird issue with srcML
+/// and garbage text ending up at the end of the cstring it returns.
+/// </summary>
+inline char* TrimFromEnd(char *s, size_t len){
+    for (int i = len - 1; i > 0; --i){
+        if (s[i] != '>'){
+            s[i] = 0;
+        }else{
+            return s;
+        }
+    }
+    return nullptr;
 }
 std::string StringToSrcML(std::string str){
 	struct srcml_archive* archive;
@@ -25,45 +40,77 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
 	srcml_archive_free(archive);
-
+	TrimFromEnd(ch, size);
 	return std::string(ch);
 }
 bool TestPrimitiveTypes(){
 	std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5;}";
 	std::string srcmlStr = StringToSrcML(str);
-	srcTypeNS::srcType typeDict(srcmlStr, 0);
-	typeDict.SetContext("main",1);
-	std::cerr<<srcmlStr;
-	{
-		auto nameprofile = typeDict.Find("c").second;
-		std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
-		if(nameprofile.type != "int" || nameprofile.category != srcTypeNS::VarCategory::primitive){
-			return false;
+	std::cerr<<srcmlStr<<std::endl;
+	try{
+		srcTypeNS::srcType typeDict(srcmlStr, 0);
+		typeDict.SetContext("main",1);
+		std::cerr<<srcmlStr;
+		{
+			auto nameprofile = typeDict.Find("c").second;
+			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
 		}
-	}
-	{
-		auto nameprofile = typeDict.Find("v").second;
-		std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
-		if(nameprofile.type != "int" || nameprofile.category != srcTypeNS::VarCategory::primitive || nameprofile.isConst != true){
-			return false;
+		{
+			auto nameprofile = typeDict.Find("v").second;
+			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
+	    	assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.isConst);
 		}
-	}
-	{
-		auto nameprofile = typeDict.Find("e").second;
-		std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
-		if(nameprofile.type != "int" || nameprofile.category != srcTypeNS::VarCategory::primitive || nameprofile.isConst != true){
-			return false;
+		{
+			auto nameprofile = typeDict.Find("e").second;
+			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.isConst);
 		}
+	}catch(SAXError e){
+		std::cerr<<"ERROR: "<<e.message;
 	}
 	return true;
 }
 bool TestComplexType(){
+	std::string str = "int main(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
+	std::string srcmlStr = StringToSrcML(str);
+	std::cerr<<srcmlStr<<std::endl;
+	try{
+		srcTypeNS::srcType typeDict(srcmlStr, 0);
+		typeDict.SetContext("main",1);
+		std::cerr<<srcmlStr;
+		{
+			auto nameprofile = typeDict.Find("coo").second;
+			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined);
+		}
+		{
+			auto nameprofile = typeDict.Find("ke_e4e").second;
+			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
+	    	assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined && nameprofile.isConst);
+		}
+		{
+			auto nameprofile = typeDict.Find("caa34").second;
+			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined && nameprofile.isConst);
+		}
+    }catch(SAXError e){
+		std::cerr<<"ERROR: "<<e.message;
+	}
 	return true;
 }
 bool TestTypedefedType(){
 	return true;
 }
 bool TestFunctionReturnType(){
+	std::string str = "int main(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
+	std::string srcmlStr = StringToSrcML(str);
+	srcTypeNS::srcType typeDict(srcmlStr, 0);
+	typeDict.SetContext("main",1);
+	auto functiondata = typeDict.GetScopeProfile();
+	{
+		assert(functiondata.name == "main");
+	}
 	return true;
 }
 bool TestNamespacedTypedefedType(){
@@ -74,6 +121,8 @@ bool TestNamespacedComplexType(){
 }
 int main(int argc, char** argv){
 	TestPrimitiveTypes();
+	TestComplexType();
+	TestFunctionReturnType();
 	//srcTypeNS::srcType typeDict;
 	//typeDict.ReadArchiveFile(argv[1]);
 	//typeDict.SerializeMap(SerializeToCppUMap);

@@ -228,6 +228,7 @@ namespace srcTypeNS {
                         ++triggerField[decl]; 
                     } },
                     { "type", [this](){
+                        currentSpecifier.clear();
                         ++triggerField[type]; 
                     } },                
                     { "expr", [this](){
