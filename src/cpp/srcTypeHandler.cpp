@@ -1,5 +1,8 @@
 #include <srcTypeHandler.hpp>
 namespace srcTypeNS{
+    void srcTypeHandler::GetTypedefNamePair(){
+        std::cerr<<ActualNameTNamePair.first<< " "<<ActualNameTNamePair.second<<std::endl;
+    }
     void srcTypeHandler::GetParamTypeNamespace(){
         currentNameProfile.namespacename = currentParamType.first;
         //std::cerr<<"param type namespace: "<<currentNameProfile.namespacename<<std::endl;

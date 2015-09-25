@@ -114,8 +114,13 @@ bool TestFunctionAndReturnTypeID(){
 	return true;
 }
 bool TestNamespacedTypedefedType(){
-
-
+	std::string str = "typedef int INTEGER; std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
+	std::string srcmlStr = StringToSrcML(str);
+	try{
+		srcTypeNS::srcType typeDict(srcmlStr, 0);
+	}catch(SAXError e){
+		std::cerr<<"ERROR: "<<e.message;
+	}
 	return true;
 }
 bool TestNamespacedComplexType(){
@@ -144,7 +149,7 @@ bool TestNamespacedComplexType(){
 		}
     }catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
-	}	
+	}
 	return true;
 }
 int main(int argc, char** argv){
@@ -152,6 +157,7 @@ int main(int argc, char** argv){
 	TestComplexType();
 	TestFunctionAndReturnTypeID();
 	TestNamespacedComplexType();
+	TestNamespacedTypedefedType();
 	//srcTypeNS::srcType typeDict;
 	//typeDict.ReadArchiveFile(argv[1]);
 	//typeDict.SerializeMap(SerializeToCppUMap);

@@ -25,18 +25,20 @@
 #include <srcTypeProfile.hpp>
 #include <functional>
 #include <iostream>
+#include <map>
 namespace srcTypeNS {
     class srcTypeHandler : public srcSAXHandler {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
         typedef std::pair<std::string, unsigned int> NameLineNumberPair;
+        typedef std::pair<std::string, std::string> TypedefPair;
         
         enum ParserState {decl, expr, param, decl_stmt, expr_stmt, parameter_list, 
             argument_list, argument_list_template, call, templates, ctrlflow, endflow, 
             name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
             argument, index, block, type, init, op, literal, modifier, member_list, classn,
             preproc, whileloop, forloop, ifcond, nonterminal, macro, classblock, functionblock,
-            specifier, empty, MAXENUMVALUE = empty};
+            specifier, typedefexpr, empty, MAXENUMVALUE = empty};
         
         std::vector<unsigned short int> triggerField;
         
@@ -48,7 +50,9 @@ namespace srcTypeNS {
         NameLineNumberPair currentParamType;
         NameLineNumberPair currentFunctionBody;
         NameLineNumberPair currentFunctionReturnType;
-    
+        
+        TypedefPair ActualNameTNamePair;
+
         NameLineNumberPair currentConstructor;
     
         NameProfile currentNameProfile;
@@ -64,7 +68,7 @@ namespace srcTypeNS {
     
         unsigned int lineNum;
         unsigned int constructorNum;
-    
+        std::map<std::string, std::string> typedefExprMap;
         std::unordered_map< std::string, std::function<void()>> process_map;
         std::unordered_map< std::string, std::function<void()>> process_map2;
     public:
@@ -72,6 +76,8 @@ namespace srcTypeNS {
         void GetDeclStmtName();
         void GetDeclStmtNamespace();
         
+        void GetTypedefNamePair();
+
         void GetClassLevelTypeName();
         void GetClassLevelDeclName();
         void GetClassLevelDeclNamespace();
@@ -230,7 +236,10 @@ namespace srcTypeNS {
                     { "type", [this](){
                         currentSpecifier.clear();
                         ++triggerField[type]; 
-                    } },                
+                    } },
+                    { "typedef", [this](){
+                        ++triggerField[typedefexpr]; 
+                    } },          
                     { "expr", [this](){
                         ++triggerField[expr];
                     } },
@@ -387,6 +396,10 @@ namespace srcTypeNS {
                             GetFunctionReturnType();
                         }
                         --triggerField[type];
+                    } },
+                    { "typedef", [this](){
+                        GetTypedefNamePair();
+                        --triggerField[typedefexpr]; 
                     } },    
                     { "expr", [this](){
                         --triggerField[expr];
@@ -548,6 +561,13 @@ namespace srcTypeNS {
             }
             if(triggerField[specifier]){
                 currentSpecifier.append(ch, len);
+            }
+            if(triggerField[typedefexpr]){
+                if(triggerField[type] && triggerField[name]){
+                    ActualNameTNamePair.first = std::string(ch, len);
+                }else if(!triggerField[type] && triggerField[name]){
+                    ActualNameTNamePair.second = std::string(ch, len);
+                }
             }
             if(triggerField[classn] && triggerField[name] && !(triggerField[classblock])){
                 cvmIt = tDict->fvMap.insert(std::make_pair(std::string(ch,len), ScopeProfile(std::string(ch,len)))).first;
