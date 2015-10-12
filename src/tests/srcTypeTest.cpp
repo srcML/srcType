@@ -1,6 +1,6 @@
 #include <srcType.hpp>
 #include <iostream>
-#include <srcml/srcml.h>
+#include <srcml.h>
 #include <cassert>
 std::string SerializeToCppUMap(srcTypeNS::FunctionVarMap mp){
     return SerializeMapToString(mp);
