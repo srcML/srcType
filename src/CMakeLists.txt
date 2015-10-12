@@ -4,10 +4,10 @@ file(GLOB SRCTYPEHANDLER_SOURCE cpp/*.cpp)
 file(GLOB SRCTYPEHANDLER_INCLUDE headers/*.hpp)
 file(GLOB SRCTYPETEST_SOURCE tests/*.cpp)
 
+link_directories(/usr/local/lib/)
+
 add_executable(srctypetest ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE} ${SRCTYPETEST_SOURCE})
 add_library(srctype ${SRCTYPEHANDLER_SOURCE} ${SRCTYPEHANDLER_INCLUDE})
-
-link_directories(/usr/lib/srcml)
 
 target_link_libraries(srctype srcsax ${LIBXML2_LIBRARIES})
 target_link_libraries(srctypetest srcsax srcml ${LIBXML2_LIBRARIES})
