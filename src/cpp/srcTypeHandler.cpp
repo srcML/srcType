@@ -56,7 +56,7 @@ namespace srcTypeNS{
     }
     void srcTypeHandler::GetFunctionName(){
         //get function name
-        std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
+        //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
         currentScopeProfile.name = currentFunctionBody.first;
         if(triggerField[classn]){
             currentScopeProfile.isMethod = true;
