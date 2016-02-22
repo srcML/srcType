@@ -44,7 +44,7 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 bool TestPrimitiveTypes(){
-	std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5;}";
+	std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5; char array[30];}";
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
@@ -63,6 +63,11 @@ bool TestPrimitiveTypes(){
 			auto nameprofile = typeDict.Find("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.isConst);
+		}
+		{
+			auto nameprofile = typeDict.Find("array").second;
+			std::cerr<<"Type4: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "char" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.usesIndex);
 		}
 	}catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;

@@ -24,7 +24,13 @@ namespace srcTypeNS{
         bool isConst;
         bool classMember;
         bool alias;
-        NameProfile(){}
+        bool usesIndex;
+        NameProfile(){
+            usesIndex = false;
+            alias = false;
+            classMember = false;
+            isConst = false;
+        }
         NameProfile(std::string lnum, std::string cat, std::string typen, std::string nm, std::string nspacename, std::string classmem, std::string ali, bool cnst){
             linenumber = std::stoi(lnum);
             category = std::stoi(cat);
@@ -34,6 +40,7 @@ namespace srcTypeNS{
             classMember = std::stoi(classmem);
             alias = std::stoi(ali);
             isConst = cnst;
+            usesIndex = false;
         }
         void clear(){
             linenumber = 0;
@@ -44,6 +51,7 @@ namespace srcTypeNS{
             classMember = false;
             alias = false;
             isConst = false;
+            usesIndex = false;
         }
     };
     struct ScopeProfile{

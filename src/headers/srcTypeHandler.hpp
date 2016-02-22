@@ -184,6 +184,7 @@ namespace srcTypeNS {
                         ++triggerField[member_list];
                     } },
                     { "index", [this](){
+                        currentNameProfile.usesIndex = true;
                         ++triggerField[index];
                     } },
                     { "operator", [this](){
