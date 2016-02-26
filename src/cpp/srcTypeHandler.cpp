@@ -1,19 +1,19 @@
 #include <srcTypeHandler.hpp>
 namespace srcTypeNS{
     void srcTypeHandler::GetTypedefNamePair(){
-        //std::cerr<<ActualNameTNamePair.first<< " "<<ActualNameTNamePair.second<<std::endl;
+        //std::cerr<<ActualNameTNamePair.first<< " "<<lineNum<<std::endl;
     }
     void srcTypeHandler::GetParamTypeNamespace(){
         currentNameProfile.namespacename = currentParamType.first;
         //std::cerr<<"param type namespace: "<<currentNameProfile.namespacename<<std::endl;
-        currentNameProfile.linenumber = currentParamType.second;
+        currentNameProfile.linenumber = lineNum;
         currentParamType.first.clear();
     }
     void srcTypeHandler::GetParamType(){
         //Get param types
         currentNameProfile.type = currentParamType.first;
         //std::cerr<<"param type: "<<currentNameProfile.type<<std::endl;
-        currentNameProfile.linenumber = currentParamType.second;
+        currentNameProfile.linenumber = lineNum;
         if(cppPrimTypes.find(currentParamType.first) != cppPrimTypes.end()){
             currentNameProfile.category = primitive;
         }else{
@@ -27,7 +27,7 @@ namespace srcTypeNS{
         }
         //Get Param names
         currentNameProfile.name = currentParam.first;
-        currentNameProfile.linenumber = currentParam.second;
+        currentNameProfile.linenumber = lineNum;
         //std::cerr<<"param name: "<<currentParam.first<<std::endl;
         currentParam.first.clear();
     }
@@ -77,7 +77,7 @@ namespace srcTypeNS{
     void srcTypeHandler::GetDeclStmtNamespace(){
         currentNameProfile.namespacename = currentDeclType.first;
         //std::cerr<<"decl namespace: "<<currentDeclType.first<<std::endl;
-        currentNameProfile.linenumber = currentDeclType.second;
+        currentNameProfile.linenumber = lineNum;
         currentDeclType.first.clear();
     }
     void srcTypeHandler::GetTypeName(){
@@ -85,7 +85,7 @@ namespace srcTypeNS{
             currentNameProfile.type = currentDeclType.first;
         }
         //std::cerr<<"decl type: "<<currentDeclType.first<<std::endl;
-        currentNameProfile.linenumber = currentDeclType.second;
+        currentNameProfile.linenumber = lineNum;
         if(cppPrimTypes.find(currentNameProfile.type) != cppPrimTypes.end()){
             currentNameProfile.category = primitive;
         }else{
@@ -98,8 +98,7 @@ namespace srcTypeNS{
             currentNameProfile.isConst = true;
         }
         currentNameProfile.name = currentDecl.first;
-        //std::cerr<<"decl name: "<<currentDecl.first<<std::endl;
-        currentNameProfile.linenumber = currentDecl.second;
+        currentNameProfile.linenumber = lineNum;
         currentDecl.first.clear();
     }
     void srcTypeHandler::GetClassLevelTypeName(){

@@ -52,22 +52,29 @@ bool TestPrimitiveTypes(){
 		{
 			auto nameprofile = typeDict.Find("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.type == "int");
+			assert( nameprofile.category == srcTypeNS::VarCategory::primitive);
 		}
 		{
 			auto nameprofile = typeDict.Find("v").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
-	    	assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.isConst);
+	    	assert(nameprofile.type == "int");
+	    	assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
+	    	assert(nameprofile.isConst);
 		}
 		{
 			auto nameprofile = typeDict.Find("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.isConst);
+			assert(nameprofile.type == "int"); 
+			assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.isConst);
 		}
 		{
 			auto nameprofile = typeDict.Find("array").second;
 			std::cerr<<"Type4: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "char" && nameprofile.category == srcTypeNS::VarCategory::primitive && nameprofile.usesIndex);
+			assert(nameprofile.type == "char");
+			assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.usesIndex);
 		}
 	}catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
@@ -96,6 +103,32 @@ bool TestComplexType(){
 			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined && nameprofile.isConst);
 		}
     }catch(SAXError e){
+		std::cerr<<"ERROR: "<<e.message;
+	}
+	return true;
+}
+bool TestPrimitiveTypesMultiDecl(){
+	std::string str = "int main(){int c = 5, v = c, e = 5+c;}";
+	std::string srcmlStr = StringToSrcML(str);
+	try{
+		srcTypeNS::srcType typeDict(srcmlStr, 0);
+		typeDict.SetContext("main",1);
+		{
+			auto nameprofile = typeDict.Find("c").second;
+			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+		}
+		{
+			auto nameprofile = typeDict.Find("v").second;
+			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
+	    	assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+		}
+		{
+			auto nameprofile = typeDict.Find("e").second;
+			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
+			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+		}
+	}catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
 	}
 	return true;
@@ -163,6 +196,7 @@ int main(int argc, char** argv){
 	TestFunctionAndReturnTypeID();
 	TestNamespacedComplexType();
 	TestNamespacedTypedefedType();
+	TestPrimitiveTypesMultiDecl();
 	//srcTypeNS::srcType typeDict;
 	//typeDict.ReadArchiveFile(argv[1]);
 	//typeDict.SerializeMap(SerializeToCppUMap);
