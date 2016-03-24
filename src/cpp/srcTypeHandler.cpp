@@ -117,7 +117,9 @@ namespace srcTypeNS{
         if(triggerField[modifier]){
             classNameProfile.alias =  true;
         }
-        cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first+std::to_string(lineNum), classNameProfile));
+        if(cvmIt != tDict->fvMap.end()){  
+            cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first+std::to_string(lineNum), classNameProfile));
+        }
         classNameProfile.clear();
         currentDecl.first.clear();
     }

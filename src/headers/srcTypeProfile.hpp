@@ -31,17 +31,6 @@ namespace srcTypeNS{
             classMember = false;
             isConst = false;
         }
-        NameProfile(std::string lnum, std::string cat, std::string typen, std::string nm, std::string nspacename, std::string classmem, std::string ali, bool cnst){
-            linenumber = std::stoi(lnum);
-            category = std::stoi(cat);
-            type = typen;
-            name = nm;
-            namespacename = nspacename;
-            classMember = std::stoi(classmem);
-            alias = std::stoi(ali);
-            isConst = cnst;
-            usesIndex = false;
-        }
         void clear(){
             linenumber = 0;
             category = 0;
@@ -62,14 +51,15 @@ namespace srcTypeNS{
         bool isMethod;
         bool isConst;
         bool hasConstReturn;
+        bool alias;
         int category;
         VarTypeMap vtMap;
-        ScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false;}
+        ScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
         
-        ScopeProfile(std::string nm):name(nm){isMethod = false; isConst = false; hasConstReturn = false;}
+        ScopeProfile(std::string nm):name(nm){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
         
-        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hcnstret, VarTypeMap vtm)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), 
+        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hcnstret, bool isAlias, VarTypeMap vtm)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), alias(isAlias),
         hasConstReturn(hcnstret), vtMap(vtm){}
 
         ScopeProfile operator+=(const ScopeProfile& fp){
@@ -86,6 +76,7 @@ namespace srcTypeNS{
                 isConst = fp.isConst;
                 isMethod = fp.isMethod;
                 hasConstReturn = fp.hasConstReturn;
+                alias = fp.alias;
                 if(!isMethod){
                     isMethod = fp.isMethod;
                 }
@@ -99,8 +90,9 @@ namespace srcTypeNS{
             fnNamespace.clear();
             returnTypeNamespace.clear();
             isMethod = false;
-            category = false;
+            category = 0;
             isConst = false;
+            alias = false;
             hasConstReturn = false;
             vtMap.clear();
         }
@@ -113,10 +105,11 @@ namespace srcTypeNS{
         bool isMethod;
         bool isConst;
         bool hasConstReturn;
+        bool alias;
         int category;
-        SScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false;}
-        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hascnstret)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), hasConstReturn(hascnstret){}
+        SScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
+        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hascnstret, bool isAlias)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), hasConstReturn(hascnstret), alias(isAlias){}
         SScopeProfile(const ScopeProfile& fp){
             name = fp.name;
             fnNamespace = fp.fnNamespace;
@@ -126,6 +119,7 @@ namespace srcTypeNS{
             category = fp.category;
             isConst = fp.isConst;
             hasConstReturn = fp.hasConstReturn;
+            alias = fp.alias;
         }
     };
     

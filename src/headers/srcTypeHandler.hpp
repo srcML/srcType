@@ -97,6 +97,7 @@ namespace srcTypeNS {
         void GetParamTypeNamespace();
     
         srcTypeHandler(TypeDictionary* tnDict){
+                cvmIt = tDict->fvMap.end();
                 tDict = tnDict;
                 fvmIt = tDict->fvMap.insert(std::make_pair("Global", ScopeProfile())).first;
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
@@ -181,6 +182,9 @@ namespace srcTypeNS {
                     { "class", [this](){
                         ++triggerField[classn];
                     } },
+                    { "struct", [this](){
+                        ++triggerField[classn];
+                    } },
                     { "destructor", [this](){
                         ++triggerField[destructor];
                     } },
@@ -240,6 +244,9 @@ namespace srcTypeNS {
                     } },
                     { "modifier", [this](){
                         currentNameProfile.alias = true;
+                        if(triggerField[function] && triggerField[type] && !(triggerField[functionblock] || triggerField[argument_list] || triggerField[templates] || triggerField[parameter_list])){
+                            currentScopeProfile.alias = true;
+                        }
                         ++triggerField[modifier];
                     } },
                     { "decl", [this](){
@@ -324,8 +331,11 @@ namespace srcTypeNS {
                     } },
                     { "destructor_decl", [this](){
                         --triggerField[destructordecl];
-                    } },            
+                    } },
                     { "class", [this](){
+                        --triggerField[classn];
+                    } },
+                    { "struct", [this](){
                         --triggerField[classn];
                     } },
                     { "parameter", [this](){
@@ -380,7 +390,6 @@ namespace srcTypeNS {
                             GetClassLevelDeclName();
                         }
                         if(!currentNameProfile.name.empty()){
-                            //std::cerr<<"decl name: "<<currentNameProfile.type<<" "<<currentNameProfile.name<<" "<<lineNum<<std::endl;
                             vtmIt = currentScopeProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
                             if(triggerField[classn]){
                                 vtmIt->second.classMember = true;
