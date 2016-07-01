@@ -1,6 +1,6 @@
 Lightweight tool for static type resolution
 
-To build srcSlice:
+To build srcType:
 
     Clone the repository with 'git clone --recursive' into the desired directory. Make sure you include the --recursive as srcType includes a submodule that must also be cloned.
 
