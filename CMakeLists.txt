@@ -22,14 +22,21 @@
 cmake_minimum_required(VERSION 2.8)
 project(srcType)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake)
+
+# find needed libraries
+find_package(LibXml2 REQUIRED)
+
 
 set(CMAKE_CXX_COMPILER "c++")
 set(CMAKE_CXX_FLAGS "-std=c++0x -O3")
 
-SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/build)
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/build)
+# set output directory for binaries and libraries
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-include_directories(/usr/local/include ${LIBXML2_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/srcSAX/src/srcsax ${CMAKE_SOURCE_DIR}/srcSAX/src/cpp src/headers src/cpp)
+# include needed includes
+include_directories(/usr/local/include ${LIBXML2_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/srcSAX/src/srcsax ${CMAKE_SOURCE_DIR}/srcSAX/src/cpp ${CMAKE_SOURCE_DIR}/srcSAX/src/windows src/headers src/cpp)
 
+add_subdirectory(srcSAX/src)
 add_subdirectory(src)
