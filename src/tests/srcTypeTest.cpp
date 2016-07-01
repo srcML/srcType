@@ -191,14 +191,14 @@ bool TestNamespacedComplexType(){
 	return true;
 }
 int main(int argc, char** argv){
-	TestPrimitiveTypes();
-	TestComplexType();
-	TestFunctionAndReturnTypeID();
-	TestNamespacedComplexType();
-	TestNamespacedTypedefedType();
-	TestPrimitiveTypesMultiDecl();
-	//srcTypeNS::srcType typeDict;
-	//typeDict.ReadArchiveFile(argv[1]);
+	//TestPrimitiveTypes();
+	//TestComplexType();
+	//TestFunctionAndReturnTypeID();
+	//TestNamespacedComplexType();
+	//TestNamespacedTypedefedType();
+	//TestPrimitiveTypesMultiDecl();
+	srcTypeNS::srcType typeDict;
+	typeDict.ReadArchiveFile(argv[1]);
 	//typeDict.SerializeMap(SerializeToCppUMap);
 	//std::cerr<<typeDict.size();
 }
