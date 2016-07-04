@@ -46,7 +46,8 @@ bool TestPrimitiveTypes(){
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("testsrcType.cppmain",1);
+		typeDict.SetFunctionContext("testsrcType.cpp", 1);
+		typeDict.SetVariableContext("main",1);
 		{
 			auto nameprofile = typeDict.Find("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
@@ -82,9 +83,11 @@ bool TestPrimitiveTypes(){
 bool TestComplexType(){
 	std::string str = "int main(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
 	std::string srcmlStr = StringToSrcML(str);
+	
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("testsrcType.cppmain",1);
+		typeDict.SetFunctionContext("testsrcType.cpp", 1);
+		typeDict.SetVariableContext("main",1);
 		{
 			auto nameprofile = typeDict.Find("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
@@ -108,9 +111,11 @@ bool TestComplexType(){
 bool TestPrimitiveTypesMultiDecl(){
 	std::string str = "int main(){int c = 5, v = c, e = 5+c;}";
 	std::string srcmlStr = StringToSrcML(str);
+	
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("testsrcType.cppmain",1);
+		typeDict.SetFunctionContext("testsrcType.cpp", 1);
+		typeDict.SetVariableContext("main",1);
 		{
 			auto nameprofile = typeDict.Find("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
@@ -138,7 +143,9 @@ bool TestFunctionAndReturnTypeID(){
 	std::string str = "std::string srcTypeNS::Foo(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
 	std::string srcmlStr = StringToSrcML(str);
 	srcTypeNS::srcType typeDict(srcmlStr, 0);
-	typeDict.SetContext("testsrcType.cppFoo",1);
+	
+	typeDict.SetFunctionContext("testsrcType.cpp", 1);
+	typeDict.SetVariableContext("Foo",1);
 	
 	auto functiondata = typeDict.GetFunctionProfile();
 	
@@ -162,9 +169,11 @@ bool TestNamespacedTypedefedType(){
 bool TestNamespacedComplexType(){
 	std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
 	std::string srcmlStr = StringToSrcML(str);
+	
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("testsrcType.cppFoo",1);
+		typeDict.SetFunctionContext("testsrcType.cpp", 1);
+		typeDict.SetVariableContext("Foo",1);
 		{
 			auto nameprofile = typeDict.Find("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;

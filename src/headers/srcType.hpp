@@ -19,8 +19,13 @@ namespace srcTypeNS{
             SFunctionProfile GetFunctionProfile() const{
                 return SFunctionProfile(dictionary.currentContext.currentFunc->second);
             }
-            bool SetContext(std::string fn, int linenumber){
-                FunctionVarMap::iterator it = dictionary.fvMap.find(fn);
+            bool SetFunctionContext(std::string file, int lineNumber){
+                dictionary.currentContext.ln = lineNumber;
+                dictionary.currentContext.fileName = file;
+                return true;
+            }
+            bool SetVariableContext(std::string fn, int linenumber){
+                FunctionVarMap::iterator it = dictionary.fvMap.find(dictionary.currentContext.fileName+fn+std::to_string(dictionary.currentContext.ln));
                 if(it != dictionary.fvMap.end()){
                     dictionary.currentContext.currentFunc = it;
                     dictionary.currentContext.ln = linenumber;
@@ -29,12 +34,20 @@ namespace srcTypeNS{
                 }
                 return false;
             }
-            bool SetContext(int linenumber){
+            bool SetVariableContext(int linenumber){
                 if(dictionary.currentContext.currentFunc != dictionary.fvMap.end()){
                     dictionary.currentContext.ln = linenumber;
                     return true;
                 }
                 return false;
+            }
+            //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
+            std::pair<bool, SFunctionProfile> FindFunction(std::string funcname) const{
+                FunctionVarMap::const_iterator fvmIt = dictionary.fvMap.find(dictionary.currentContext.fileName+funcname+std::to_string(dictionary.currentContext.ln));
+                if(fvmIt != dictionary.fvMap.end()){
+                    return std::make_pair(true, SFunctionProfile(fvmIt->second));
+                }
+                return std::make_pair(false, SFunctionProfile());
             }
             //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
             std::pair<bool, VariableProfile> Find(std::string funcname, std::string varname, int lineNumber)const{

@@ -99,6 +99,7 @@ namespace srcTypeNS{
             vtMap.clear();
         }
     };
+    //This struct is basically for when someone just wants function data without variable data. It clips off the variable dictionary to make things a bit faster.
     struct SFunctionProfile{
         std::string name;
         std::string fnNamespace;
@@ -128,8 +129,9 @@ namespace srcTypeNS{
     struct TypeDictionary{
         //context can be used to keep track of what function you're searching in. Makes searching faster because I assume you're using that function as the context
         struct Context{
-                std::string functionName;
                 int ln;
+                std::string fileName;
+                std::string functionName;
                 FunctionVarMap::iterator currentFunc;
                 Context(std::string func, unsigned int line, FunctionVarMap::iterator it): functionName(func), ln(line), currentFunc(it){}
                 Context():functionName(""), ln(-1){}

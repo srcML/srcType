@@ -132,11 +132,11 @@ namespace srcTypeNS {
                             if(triggerField[function]){
                                 //std::cerr<<"Ineserting: "<<currentFunctionProfile.name<<std::endl;
                                 std::string fullname = currentFile.substr(currentFile.rfind('/')+1, currentFile.size());
-                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name, FunctionProfile())).first;
+                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name+std::to_string(lineNum), FunctionProfile())).first;
                             }else if(triggerField[constructor]){
                                 std::string fullname = currentFile.substr(currentFile.rfind('/')+1, currentFile.size());
                                 //std::cerr<<"Ineserting: "<<currentFunctionProfile.name<<std::endl;
-                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name+std::to_string(constructorNum), FunctionProfile())).first;
+                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name+std::to_string(lineNum), FunctionProfile())).first;
                                 ++constructorNum;
                             }
                         }
