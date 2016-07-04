@@ -2,9 +2,7 @@
 #include <iostream>
 #include <srcml.h>
 #include <cassert>
-std::string SerializeToCppUMap(srcTypeNS::FunctionVarMap mp){
-    return SerializeMapToString(mp);
-}
+
 /// <summary>
 /// Utility function that trims from the right of a string. For now it's just solving a weird issue with srcML
 /// and garbage text ending up at the end of the cstring it returns.
