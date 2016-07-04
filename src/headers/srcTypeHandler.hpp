@@ -43,6 +43,7 @@ namespace srcTypeNS {
         std::vector<unsigned short int> triggerField;
         
         std::string currentSpecifier;
+        std::string currentFile;
 
         NameLineNumberPair currentDecl;
         NameLineNumberPair currentDeclType;
@@ -55,10 +56,10 @@ namespace srcTypeNS {
 
         NameLineNumberPair currentConstructor;
     
-        NameProfile currentNameProfile;
-        NameProfile classNameProfile;
+        VariableProfile currentVariableProfile;
+        VariableProfile classNameProfile;
 
-        ScopeProfile currentScopeProfile;
+        FunctionProfile currentFunctionProfile;
         
         TypeDictionary* tDict;
         VarTypeMap::iterator vtmIt;
@@ -99,7 +100,7 @@ namespace srcTypeNS {
         srcTypeHandler(TypeDictionary* tnDict){
                 cvmIt = tDict->fvMap.end();
                 tDict = tnDict;
-                fvmIt = tDict->fvMap.insert(std::make_pair("Global", ScopeProfile())).first;
+                fvmIt = tDict->fvMap.insert(std::make_pair("Global", FunctionProfile())).first;
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 attributeFound = false;
                 foundInit = false;
@@ -108,7 +109,7 @@ namespace srcTypeNS {
                 process_map = {
                     {"decl_stmt", [this](){
                         currentSpecifier.clear();
-                        currentNameProfile.clear();
+                        currentVariableProfile.clear();
                         ++triggerField[decl_stmt];
                     } },
                     { "expr_stmt", [this](){
@@ -116,7 +117,7 @@ namespace srcTypeNS {
                     } },
                     { "parameter_list", [this](){
                         if(currentSpecifier == "const"){
-                            currentScopeProfile.isConst = true;
+                            currentFunctionProfile.isConst = true;
                         }
                         currentSpecifier.clear();
                         if(triggerField[function] || triggerField[functiondecl]){
@@ -127,13 +128,15 @@ namespace srcTypeNS {
                             //std::cerr<<"SCTYPE: "<<currentConstructor.first<<std::endl;
                             GetConstructorName(); //split into functions for param, return and paramtype or something
                         }
-                        if(!(triggerField[functionblock] || currentScopeProfile.name.empty())){
+                        if(!(triggerField[functionblock] || currentFunctionProfile.name.empty())){
                             if(triggerField[function]){
-                                //std::cerr<<"Ineserting: "<<currentScopeProfile.name<<std::endl;
-                                fvmIt = tDict->fvMap.insert(std::make_pair(currentScopeProfile.name, ScopeProfile())).first;
+                                //std::cerr<<"Ineserting: "<<currentFunctionProfile.name<<std::endl;
+                                std::string fullname = currentFile.substr(currentFile.rfind('/')+1, currentFile.size());
+                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name, FunctionProfile())).first;
                             }else if(triggerField[constructor]){
-                                //std::cerr<<"Ineserting: "<<currentScopeProfile.name<<std::endl;
-                                fvmIt = tDict->fvMap.insert(std::make_pair(currentScopeProfile.name+std::to_string(constructorNum), ScopeProfile())).first;
+                                std::string fullname = currentFile.substr(currentFile.rfind('/')+1, currentFile.size());
+                                //std::cerr<<"Ineserting: "<<currentFunctionProfile.name<<std::endl;
+                                fvmIt = tDict->fvMap.insert(std::make_pair(fullname+currentFunctionProfile.name+std::to_string(constructorNum), FunctionProfile())).first;
                                 ++constructorNum;
                             }
                         }
@@ -163,11 +166,11 @@ namespace srcTypeNS {
                         ++triggerField[call];
                     } },
                     { "function", [this](){
-                        currentScopeProfile.clear();
+                        currentFunctionProfile.clear();
                         ++triggerField[function];
                     } },
                     { "constructor", [this](){
-                        currentScopeProfile.clear();
+                        currentFunctionProfile.clear();
                         ++triggerField[constructor];
                     } },
                     { "function_decl", [this](){
@@ -195,7 +198,7 @@ namespace srcTypeNS {
                         ++triggerField[member_list];
                     } },
                     { "index", [this](){
-                        currentNameProfile.usesIndex = true;
+                        currentVariableProfile.isArray = true;
                         ++triggerField[index];
                     } },
                     { "operator", [this](){
@@ -243,9 +246,9 @@ namespace srcTypeNS {
                         ++triggerField[literal];
                     } },
                     { "modifier", [this](){
-                        currentNameProfile.alias = true;
+                        currentVariableProfile.isAlias = true;
                         if(triggerField[function] && triggerField[type] && !(triggerField[functionblock] || triggerField[argument_list] || triggerField[templates] || triggerField[parameter_list])){
-                            currentScopeProfile.alias = true;
+                            currentFunctionProfile.isAliasReturn = true;
                         }
                         ++triggerField[modifier];
                     } },
@@ -276,7 +279,7 @@ namespace srcTypeNS {
                 };
                 process_map2 = {
                     {"decl_stmt", [this](){
-                        //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentNameProfile.name, currentNameProfile)).first;
+                        //vtmIt = fvmIt->second.vtMap.insert(std::make_pair(currentVariableProfile.name, currentVariableProfile)).first;
                         --triggerField[decl_stmt];
                     } },             
                     { "expr_stmt", [this](){
@@ -311,13 +314,13 @@ namespace srcTypeNS {
                     } },            
                     { "function", [this](){
                         //Get Function name at the end of a function. Means we can't assume we have it stored until function closes.
-                        fvmIt->second += currentScopeProfile;
+                        fvmIt->second += currentFunctionProfile;
                         //std::cerr<<"Name: "<<fvmIt->first<<std::endl;
                         --triggerField[function];
                     } },
                     { "constructor", [this](){
                         //Get Function name at the end of a function. Means we can't assume we have it stored until function closes.
-                        fvmIt->second = currentScopeProfile;
+                        fvmIt->second = currentFunctionProfile;
                         --triggerField[constructor];
                     } },
                     { "destructor", [this](){
@@ -343,8 +346,8 @@ namespace srcTypeNS {
                         if(triggerField[parameter_list] && triggerField[param] && !(triggerField[type] || triggerField[functionblock] || triggerField[templates])){
                             GetParamName();
                         }
-                        if(!currentNameProfile.name.empty()){
-                            vtmIt = currentScopeProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
+                        if(!currentVariableProfile.name.empty()){
+                            vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentVariableProfile.name+std::to_string(lineNum), currentVariableProfile)).first;
                         }
                         --triggerField[param];
                     } },    
@@ -389,8 +392,8 @@ namespace srcTypeNS {
                         if(triggerField[classn] && !(triggerField[constructor] || triggerField[function])){
                             GetClassLevelDeclName();
                         }
-                        if(!currentNameProfile.name.empty()){
-                            vtmIt = currentScopeProfile.vtMap.insert(std::make_pair(currentNameProfile.name+std::to_string(lineNum), currentNameProfile)).first;
+                        if(!currentVariableProfile.name.empty()){
+                            vtmIt = currentFunctionProfile.vtMap.insert(std::make_pair(currentVariableProfile.name+std::to_string(lineNum), currentVariableProfile)).first;
                             if(triggerField[classn]){
                                 vtmIt->second.classMember = true;
                             }
@@ -490,7 +493,9 @@ namespace srcTypeNS {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) {
-    
+            if(num_attributes){
+                currentFile = attributes[2].value;
+            }
         }
         /**
         * startElementNs
@@ -588,7 +593,7 @@ namespace srcTypeNS {
                 }
             }
             if(triggerField[classn] && triggerField[name] && !(triggerField[classblock])){
-                cvmIt = tDict->fvMap.insert(std::make_pair(std::string(ch,len), ScopeProfile(std::string(ch,len)))).first;
+                cvmIt = tDict->fvMap.insert(std::make_pair(std::string(ch,len), FunctionProfile(std::string(ch,len)))).first;
             }
         }
     

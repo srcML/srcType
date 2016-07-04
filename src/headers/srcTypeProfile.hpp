@@ -9,74 +9,76 @@
 #include <iostream>
 namespace srcTypeNS{
     class srcTypeHandler;
-    struct NameProfile;
-    struct ScopeProfile;
+    struct VariableProfile;
+    struct FunctionProfile;
     
-    typedef std::unordered_map<std::string, NameProfile> VarTypeMap;
-    typedef std::unordered_map<std::string, ScopeProfile> FunctionVarMap;
+    typedef std::unordered_map<std::string, VariableProfile> VarTypeMap;
+    typedef std::unordered_map<std::string, FunctionProfile> FunctionVarMap;
     
-    struct NameProfile{
+    struct VariableProfile{
         int linenumber;
-        int category;
+        int isPrimitive;
         std::string type;
         std::string name;
-        std::string namespacename;
+        std::string varNamespace;
         bool isConst;
         bool classMember;
-        bool alias;
-        bool usesIndex;
-        NameProfile(){
-            usesIndex = false;
-            alias = false;
+        bool isAlias;
+        bool isArray;
+        VariableProfile(){
+            isArray = false;
+            isAlias = false;
             classMember = false;
             isConst = false;
         }
         void clear(){
             linenumber = 0;
-            category = 0;
+            isPrimitive = false;
             type.clear();
             name.clear();
-            namespacename.clear();
+            varNamespace.clear();
             classMember = false;
-            alias = false;
+            isAlias = false;
             isConst = false;
-            usesIndex = false;
+            isArray = false;
         }
     };
-    struct ScopeProfile{
+    struct FunctionProfile{
         std::string name;
         std::string fnNamespace;
         std::string returnType;
         std::string returnTypeNamespace;
+        std::string filename;
         bool isMethod;
         bool isConst;
         bool hasConstReturn;
-        bool alias;
-        int category;
+        bool isAliasReturn;
+        int isPrimitive;
         VarTypeMap vtMap;
-        ScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
+        FunctionProfile(){isMethod = false; isConst = false; hasConstReturn = false; isAliasReturn = false;}
         
-        ScopeProfile(std::string nm):name(nm){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
+        FunctionProfile(std::string nm):name(nm){isMethod = false; isConst = false; hasConstReturn = false; isAliasReturn = false;}
         
-        ScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hcnstret, bool isAlias, VarTypeMap vtm)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), alias(isAlias),
+        FunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, bool cat, bool cnst, bool hcnstret, bool alias, VarTypeMap vtm)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), isPrimitive(cat), isConst(cnst), isAliasReturn(alias),
         hasConstReturn(hcnstret), vtMap(vtm){}
 
-        ScopeProfile operator+=(const ScopeProfile& fp){
+        FunctionProfile operator+=(const FunctionProfile& fp){
             if(!name.empty()){ //currently a function we've already seen
-            for(auto it : fp.vtMap){
-                vtMap.insert(it);
-            }
+                for(auto it : fp.vtMap){
+                    vtMap.insert(it);
+                }
             }else{
+                filename = fp.filename;
                 name = fp.name;
                 fnNamespace = fp.fnNamespace;
                 returnType = fp.returnType;
                 returnTypeNamespace = fp.returnTypeNamespace;
-                category = fp.category;
+                isPrimitive = fp.isPrimitive;
                 isConst = fp.isConst;
                 isMethod = fp.isMethod;
                 hasConstReturn = fp.hasConstReturn;
-                alias = fp.alias;
+                isAliasReturn = fp.isAliasReturn;
                 if(!isMethod){
                     isMethod = fp.isMethod;
                 }
@@ -90,14 +92,14 @@ namespace srcTypeNS{
             fnNamespace.clear();
             returnTypeNamespace.clear();
             isMethod = false;
-            category = 0;
+            isPrimitive = false;
             isConst = false;
-            alias = false;
+            isAliasReturn = false;
             hasConstReturn = false;
             vtMap.clear();
         }
     };
-    struct SScopeProfile{
+    struct SFunctionProfile{
         std::string name;
         std::string fnNamespace;
         std::string returnType;
@@ -105,21 +107,21 @@ namespace srcTypeNS{
         bool isMethod;
         bool isConst;
         bool hasConstReturn;
-        bool alias;
-        int category;
-        SScopeProfile(){isMethod = false; isConst = false; hasConstReturn = false; alias = false;}
-        SScopeProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hascnstret, bool isAlias)
-        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), category(cat), isConst(cnst), hasConstReturn(hascnstret), alias(isAlias){}
-        SScopeProfile(const ScopeProfile& fp){
+        bool isAliasReturn;
+        int isPrimitive;
+        SFunctionProfile(){isMethod = false; isConst = false; hasConstReturn = false; isAliasReturn = false;}
+        SFunctionProfile(std::string nm, std::string fnNpace, std::string retType, std::string returnTNpace, std::string isMethd, int cat, bool cnst, bool hascnstret, bool alias)
+        : name(nm), fnNamespace(fnNpace), returnType(retType), returnTypeNamespace(returnTNpace), isMethod(std::stoi(isMethd)), isPrimitive(cat), isConst(cnst), hasConstReturn(hascnstret), isAliasReturn(alias){}
+        SFunctionProfile(const FunctionProfile& fp){
             name = fp.name;
             fnNamespace = fp.fnNamespace;
             returnType = fp.returnType;
             returnTypeNamespace = fp.returnTypeNamespace;
             isMethod = fp.isMethod;
-            category = fp.category;
+            isPrimitive = fp.isPrimitive;
             isConst = fp.isConst;
             hasConstReturn = fp.hasConstReturn;
-            alias = fp.alias;
+            isAliasReturn = fp.isAliasReturn;
         }
     };
     

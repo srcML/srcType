@@ -2,7 +2,7 @@
 #define TYPEDICTHPP
 namespace srcTypeNS{
     enum PrimTypes{INT, UINT, SIINT, SHINT, SISINT, USISINT, LINT, SLINT, USILINT, SILINT, LDOUBLE, WCHAR, CHAR, UCHAR, SCHAR, VOID, FLOAT, BOOL, DOUBLE, SIZE_T};
-    enum VarCategory {primitive=1, userdefined=2};
+    enum VarCategory {primitive=0, userdefined=1};
     static const std::unordered_map<std::string, PrimTypes> cppPrimTypes{
     {"int", INT},
     {"unsigned int", UINT},

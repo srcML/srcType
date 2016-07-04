@@ -46,33 +46,33 @@ bool TestPrimitiveTypes(){
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("main",1);
+		typeDict.SetContext("testsrcType.cppmain",1);
 		{
 			auto nameprofile = typeDict.Find("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int");
-			assert( nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert( nameprofile.isPrimitive == true);
 		}
 		{
 			auto nameprofile = typeDict.Find("v").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
 	    	assert(nameprofile.type == "int");
-	    	assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
+	    	assert(nameprofile.isPrimitive == true);
 	    	assert(nameprofile.isConst);
 		}
 		{
 			auto nameprofile = typeDict.Find("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int"); 
-			assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.isPrimitive == true);
 			assert(nameprofile.isConst);
 		}
 		{
 			auto nameprofile = typeDict.Find("array").second;
 			std::cerr<<"Type4: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "char");
-			assert(nameprofile.category == srcTypeNS::VarCategory::primitive);
-			assert(nameprofile.usesIndex);
+			assert(nameprofile.isPrimitive == true);
+			assert(nameprofile.isArray);
 		}
 	}catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
@@ -84,21 +84,21 @@ bool TestComplexType(){
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("main",1);
+		typeDict.SetContext("testsrcType.cppmain",1);
 		{
 			auto nameprofile = typeDict.Find("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined);
+			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false);
 		}
 		{
 			auto nameprofile = typeDict.Find("ke_e4e").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
-	    	assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined && nameprofile.isConst);
+	    	assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst);
 		}
 		{
 			auto nameprofile = typeDict.Find("caa34").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined && nameprofile.isConst);
+			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst);
 		}
     }catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
@@ -110,21 +110,21 @@ bool TestPrimitiveTypesMultiDecl(){
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("main",1);
+		typeDict.SetContext("testsrcType.cppmain",1);
 		{
 			auto nameprofile = typeDict.Find("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
 		{
 			auto nameprofile = typeDict.Find("v").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
-	    	assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+	    	assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
 		{
 			auto nameprofile = typeDict.Find("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "int" && nameprofile.category == srcTypeNS::VarCategory::primitive);
+			assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
 	}catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;
@@ -138,9 +138,9 @@ bool TestFunctionAndReturnTypeID(){
 	std::string str = "std::string srcTypeNS::Foo(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
 	std::string srcmlStr = StringToSrcML(str);
 	srcTypeNS::srcType typeDict(srcmlStr, 0);
-	typeDict.SetContext("Foo",1);
+	typeDict.SetContext("testsrcType.cppFoo",1);
 	
-	auto functiondata = typeDict.GetScopeProfile();
+	auto functiondata = typeDict.GetFunctionProfile();
 	
 	assert(functiondata.name == "Foo");
 	assert(functiondata.returnType == "string");
@@ -164,24 +164,21 @@ bool TestNamespacedComplexType(){
 	std::string srcmlStr = StringToSrcML(str);
 	try{
 		srcTypeNS::srcType typeDict(srcmlStr, 0);
-		typeDict.SetContext("Foo",1);
+		typeDict.SetContext("testsrcType.cppFoo",1);
 		{
 			auto nameprofile = typeDict.Find("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined 
-				&& nameprofile.namespacename == "std");
+			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.varNamespace == "std");
 		}
 		{
 			auto nameprofile = typeDict.Find("ke_e4e").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
-	    	assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined 
-	    		&& nameprofile.isConst && nameprofile.namespacename == "std");
+	    	assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst && nameprofile.varNamespace == "std");
 		}
 		{
 			auto nameprofile = typeDict.Find("caa34").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
-			assert(nameprofile.type == "Object" && nameprofile.category == srcTypeNS::VarCategory::userdefined 
-				&& nameprofile.isConst && nameprofile.namespacename == "std");
+			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst && nameprofile.varNamespace == "std");
 		}
     }catch(SAXError e){
 		std::cerr<<"ERROR: "<<e.message;

@@ -16,8 +16,8 @@ namespace srcTypeNS{
             srcType(int, const char*);
             void ReadArchiveFile(std::string);
             int size()const {return dictionary.fvMap.size();}
-            SScopeProfile GetScopeProfile() const{
-                return SScopeProfile(dictionary.currentContext.currentFunc->second);
+            SFunctionProfile GetFunctionProfile() const{
+                return SFunctionProfile(dictionary.currentContext.currentFunc->second);
             }
             bool SetContext(std::string fn, int linenumber){
                 FunctionVarMap::iterator it = dictionary.fvMap.find(fn);
@@ -37,7 +37,7 @@ namespace srcTypeNS{
                 return false;
             }
             //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
-            std::pair<bool, NameProfile> Find(std::string funcname, std::string varname, int lineNumber)const{
+            std::pair<bool, VariableProfile> Find(std::string funcname, std::string varname, int lineNumber)const{
                 FunctionVarMap::const_iterator fvmIt = dictionary.fvMap.find(funcname);
                 if(fvmIt != dictionary.fvMap.end()){
                     VarTypeMap::const_iterator vtmIt = fvmIt->second.vtMap.find(varname+std::to_string(lineNumber));
@@ -45,10 +45,10 @@ namespace srcTypeNS{
                         return std::make_pair(true, vtmIt->second);
                     }
                 }
-                return std::make_pair(false, NameProfile());
+                return std::make_pair(false, VariableProfile());
             }
             //Definition of find that uses the context (so it doesn't need to take a function name as context)
-            std::pair<bool, NameProfile> Find(std::string varname) const{
+            std::pair<bool, VariableProfile> Find(std::string varname) const{
                 if(!dictionary.currentContext.IsSet()){
                     throw std::runtime_error("Context not set"); //for now, std exception
                 }else{
@@ -56,10 +56,10 @@ namespace srcTypeNS{
                     if(it != dictionary.currentContext.currentFunc->second.vtMap.end()){
                         return std::make_pair(true, it->second);
                     }
-                    return std::make_pair(false, NameProfile());
+                    return std::make_pair(false, VariableProfile());
                 }
             }
-            bool Insert(std::string funcname, const NameProfile& np){
+            bool Insert(std::string funcname, const VariableProfile& np){
                 FunctionVarMap::iterator fvmIt = dictionary.fvMap.find(funcname);
                 if(fvmIt != dictionary.fvMap.end()){
                     VarTypeMap::iterator vtmIt = fvmIt->second.vtMap.find(np.name+std::to_string(np.linenumber));
@@ -73,7 +73,7 @@ namespace srcTypeNS{
                 }
                 return false;
             }
-            bool Insert(const NameProfile& np){
+            bool Insert(const VariableProfile& np){
                 if(dictionary.currentContext.ln == -1){
                     throw std::runtime_error("Context not set"); //for now, std exception
                 }else{

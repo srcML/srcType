@@ -4,109 +4,109 @@ namespace srcTypeNS{
         //std::cerr<<ActualNameTNamePair.first<< " "<<lineNum<<std::endl;
     }
     void srcTypeHandler::GetParamTypeNamespace(){
-        currentNameProfile.namespacename = currentParamType.first;
-        //std::cerr<<"param type namespace: "<<currentNameProfile.namespacename<<std::endl;
-        currentNameProfile.linenumber = lineNum;
+        currentVariableProfile.varNamespace = currentParamType.first;
+        //std::cerr<<"param type namespace: "<<currentVariableProfile.namespacename<<std::endl;
+        currentVariableProfile.linenumber = lineNum;
         currentParamType.first.clear();
     }
     void srcTypeHandler::GetParamType(){
         //Get param types
-        currentNameProfile.type = currentParamType.first;
-        //std::cerr<<"param type: "<<currentNameProfile.type<<std::endl;
-        currentNameProfile.linenumber = lineNum;
+        currentVariableProfile.type = currentParamType.first;
+        //std::cerr<<"param type: "<<currentVariableProfile.type<<std::endl;
+        currentVariableProfile.linenumber = lineNum;
         if(cppPrimTypes.find(currentParamType.first) != cppPrimTypes.end()){
-            currentNameProfile.category = primitive;
+            currentVariableProfile.isPrimitive = true;
         }else{
-            currentNameProfile.category = userdefined;
+            currentVariableProfile.isPrimitive = false;
         }
         currentParamType.first.clear();
     }
     void srcTypeHandler::GetParamName(){
         if(currentSpecifier == "const"){
-            currentNameProfile.isConst = true;
+            currentVariableProfile.isConst = true;
         }
         //Get Param names
-        currentNameProfile.name = currentParam.first;
-        currentNameProfile.linenumber = lineNum;
+        currentVariableProfile.name = currentParam.first;
+        currentVariableProfile.linenumber = lineNum;
         //std::cerr<<"param name: "<<currentParam.first<<std::endl;
         currentParam.first.clear();
     }
     void srcTypeHandler::GetFunctionReturnTypeNamespace(){
         //std::cerr<<"function namespace: "<<currentFunctionReturnType.first<<std::endl;
-        currentScopeProfile.returnTypeNamespace = currentFunctionReturnType.first;
+        currentFunctionProfile.returnTypeNamespace = currentFunctionReturnType.first;
         currentFunctionReturnType.first.clear();
     }
     void srcTypeHandler::GetFunctionReturnType(){
         //std::cerr<<"function Type: "<<currentFunctionReturnType.first<<std::endl;
         if(currentSpecifier == "const"){
-            currentScopeProfile.hasConstReturn = true;
+            currentFunctionProfile.hasConstReturn = true;
         }
-        currentScopeProfile.returnType = currentFunctionReturnType.first;
+        currentFunctionProfile.returnType = currentFunctionReturnType.first;
         if(cppPrimTypes.find(currentFunctionReturnType.first) != cppPrimTypes.end()){
-            currentScopeProfile.category = primitive;
+            currentFunctionProfile.isPrimitive = true;
         }else{
-            currentScopeProfile.category = userdefined;
+            currentFunctionProfile.isPrimitive = false;
         }
         currentFunctionReturnType.first.clear();
     }
     void srcTypeHandler::GetFunctionNameResolution(){
         //std::cerr<<"function Name resultion: "<<currentFunctionBody.first<<std::endl;
-        currentScopeProfile.fnNamespace = currentFunctionBody.first;
+        currentFunctionProfile.fnNamespace = currentFunctionBody.first;
         currentFunctionBody.first.clear();
     }
     void srcTypeHandler::GetFunctionName(){
         //get function name
         //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
-        currentScopeProfile.name = currentFunctionBody.first;
+        currentFunctionProfile.name = currentFunctionBody.first;
         if(triggerField[classn]){
-            currentScopeProfile.isMethod = true;
+            currentFunctionProfile.isMethod = true;
         }
         currentFunctionBody.first.clear();
     }
     void srcTypeHandler::GetConstructorNameResolution(){
         //std::cerr<<"function Name resultion: "<<currentFunctionBody.first<<std::endl;
-        currentScopeProfile.fnNamespace = currentConstructor.first;
+        currentFunctionProfile.fnNamespace = currentConstructor.first;
         currentConstructor.first.clear();
     }
     void srcTypeHandler::GetConstructorName(){
         //get function name
         //std::cerr<<"function Name: "<<currentFunctionBody.first<<std::endl;
-        currentScopeProfile.name = currentConstructor.first;
+        currentFunctionProfile.name = currentConstructor.first;
         currentConstructor.first.clear();
     }
     void srcTypeHandler::GetDeclStmtNamespace(){
-        currentNameProfile.namespacename = currentDeclType.first;
+        currentVariableProfile.varNamespace = currentDeclType.first;
         //std::cerr<<"decl namespace: "<<currentDeclType.first<<std::endl;
-        currentNameProfile.linenumber = lineNum;
+        currentVariableProfile.linenumber = lineNum;
         currentDeclType.first.clear();
     }
     void srcTypeHandler::GetTypeName(){
-        if(currentNameProfile.type.empty()){
-            currentNameProfile.type = currentDeclType.first;
+        if(currentVariableProfile.type.empty()){
+            currentVariableProfile.type = currentDeclType.first;
         }
         //std::cerr<<"decl type: "<<currentDeclType.first<<std::endl;
-        currentNameProfile.linenumber = lineNum;
-        if(cppPrimTypes.find(currentNameProfile.type) != cppPrimTypes.end()){
-            currentNameProfile.category = primitive;
+        currentVariableProfile.linenumber = lineNum;
+        if(cppPrimTypes.find(currentVariableProfile.type) != cppPrimTypes.end()){
+            currentVariableProfile.isPrimitive = true;
         }else{
-            currentNameProfile.category = userdefined;
+            currentVariableProfile.isPrimitive = false;
         }
         currentDeclType.first.clear();
     }
     void srcTypeHandler::GetDeclStmtName(){
         if(currentSpecifier == "const"){
-            currentNameProfile.isConst = true;
+            currentVariableProfile.isConst = true;
         }
-        currentNameProfile.name = currentDecl.first;
-        currentNameProfile.linenumber = lineNum;
+        currentVariableProfile.name = currentDecl.first;
+        currentVariableProfile.linenumber = lineNum;
         currentDecl.first.clear();
     }
     void srcTypeHandler::GetClassLevelTypeName(){
         classNameProfile.type = currentDeclType.first;
         if(cppPrimTypes.find(currentDeclType.first) != cppPrimTypes.end()){
-            classNameProfile.category = primitive;
+            classNameProfile.isPrimitive = true;
         }else{
-            classNameProfile.category = userdefined;
+            classNameProfile.isPrimitive = false;
         }
         currentDeclType.first.clear();
     }
@@ -115,7 +115,7 @@ namespace srcTypeNS{
         classNameProfile.linenumber = lineNum;
         classNameProfile.classMember = true;
         if(triggerField[modifier]){
-            classNameProfile.alias =  true;
+            classNameProfile.isAlias =  true;
         }
         if(cvmIt != tDict->fvMap.end()){  
             cvmIt->second.vtMap.insert(std::make_pair(currentDecl.first+std::to_string(lineNum), classNameProfile));
