@@ -24,6 +24,7 @@ namespace srcTypeNS{
                 dictionary.currentContext.fileName = file;
                 return true;
             }
+            //Assumes SetFunctionContext was used first
             bool SetVariableContext(std::string fn, int linenumber){
                 FunctionVarMap::iterator it = dictionary.fvMap.find(dictionary.currentContext.fileName+fn+std::to_string(dictionary.currentContext.ln));
                 if(it != dictionary.fvMap.end()){
