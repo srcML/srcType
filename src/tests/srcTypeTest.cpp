@@ -49,27 +49,27 @@ bool TestPrimitiveTypes(){
 		typeDict.SetFunctionContext("testsrcType.cpp", 1);
 		typeDict.SetVariableContext("main",1);
 		{
-			auto nameprofile = typeDict.Find("c").second;
+			auto nameprofile = typeDict.FindVariable("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int");
 			assert( nameprofile.isPrimitive == true);
 		}
 		{
-			auto nameprofile = typeDict.Find("v").second;
+			auto nameprofile = typeDict.FindVariable("v").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
 	    	assert(nameprofile.type == "int");
 	    	assert(nameprofile.isPrimitive == true);
 	    	assert(nameprofile.isConst);
 		}
 		{
-			auto nameprofile = typeDict.Find("e").second;
+			auto nameprofile = typeDict.FindVariable("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int"); 
 			assert(nameprofile.isPrimitive == true);
 			assert(nameprofile.isConst);
 		}
 		{
-			auto nameprofile = typeDict.Find("array").second;
+			auto nameprofile = typeDict.FindVariable("array").second;
 			std::cerr<<"Type4: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "char");
 			assert(nameprofile.isPrimitive == true);
@@ -89,17 +89,17 @@ bool TestComplexType(){
 		typeDict.SetFunctionContext("testsrcType.cpp", 1);
 		typeDict.SetVariableContext("main",1);
 		{
-			auto nameprofile = typeDict.Find("coo").second;
+			auto nameprofile = typeDict.FindVariable("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false);
 		}
 		{
-			auto nameprofile = typeDict.Find("ke_e4e").second;
+			auto nameprofile = typeDict.FindVariable("ke_e4e").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
 	    	assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst);
 		}
 		{
-			auto nameprofile = typeDict.Find("caa34").second;
+			auto nameprofile = typeDict.FindVariable("caa34").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst);
 		}
@@ -117,17 +117,17 @@ bool TestPrimitiveTypesMultiDecl(){
 		typeDict.SetFunctionContext("testsrcType.cpp", 1);
 		typeDict.SetVariableContext("main",1);
 		{
-			auto nameprofile = typeDict.Find("c").second;
+			auto nameprofile = typeDict.FindVariable("c").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
 		{
-			auto nameprofile = typeDict.Find("v").second;
+			auto nameprofile = typeDict.FindVariable("v").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
 	    	assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
 		{
-			auto nameprofile = typeDict.Find("e").second;
+			auto nameprofile = typeDict.FindVariable("e").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "int" && nameprofile.isPrimitive == true);
 		}
@@ -175,17 +175,17 @@ bool TestNamespacedComplexType(){
 		typeDict.SetFunctionContext("testsrcType.cpp", 1);
 		typeDict.SetVariableContext("Foo",1);
 		{
-			auto nameprofile = typeDict.Find("coo").second;
+			auto nameprofile = typeDict.FindVariable("coo").second;
 			std::cerr<<"Type1: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.varNamespace == "std");
 		}
 		{
-			auto nameprofile = typeDict.Find("ke_e4e").second;
+			auto nameprofile = typeDict.FindVariable("ke_e4e").second;
 			std::cerr<<"Type2: "<< nameprofile.type<<std::endl;
 	    	assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst && nameprofile.varNamespace == "std");
 		}
 		{
-			auto nameprofile = typeDict.Find("caa34").second;
+			auto nameprofile = typeDict.FindVariable("caa34").second;
 			std::cerr<<"Type3: "<< nameprofile.type<<std::endl;
 			assert(nameprofile.type == "Object" && nameprofile.isPrimitive == false && nameprofile.isConst && nameprofile.varNamespace == "std");
 		}
