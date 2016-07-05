@@ -194,6 +194,17 @@ bool TestNamespacedComplexType(){
 	}
 	return true;
 }
+
+bool TestFindFunction(){
+	std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
+	std::string srcmlStr = StringToSrcML(str);
+	
+	srcTypeNS::srcType typeDict(srcmlStr, 0);
+	typeDict.SetFunctionContext("testsrcType.cpp", 1);
+	auto functoinprofile = typeDict.FindFunction("Foo");
+	assert(functoinprofile.second.name == "Foo");
+	assert(functoinprofile.second.isPrimitive == false);
+}
 int main(int argc, char** argv){
 	TestPrimitiveTypes();
 	TestComplexType();
@@ -201,6 +212,7 @@ int main(int argc, char** argv){
 	TestNamespacedComplexType();
 	TestNamespacedTypedefedType();
 	TestPrimitiveTypesMultiDecl();
+	TestFindFunction();
 	//srcTypeNS::srcType typeDict;
 	//typeDict.ReadArchiveFile(argv[1]);
 	//typeDict.SerializeMap(SerializeToCppUMap);
