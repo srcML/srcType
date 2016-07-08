@@ -7,4 +7,4 @@ To run this example:
 3. ./srctypeexample (name of srcml archive)
 
 
-A sample srcML archive is provided: example.cpp.xml. ./srctypeexample {path to example.cpp.xml} will run it.
+A sample srcML archive is provided in examples/src: It is called example.cpp.xml. ./srctypeexample {path to example.cpp.xml} will run it.
