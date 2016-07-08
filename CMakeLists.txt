@@ -40,3 +40,4 @@ include_directories(/usr/local/include ${LIBXML2_INCLUDE_DIR} ${CMAKE_SOURCE_DIR
 
 add_subdirectory(srcSAX/src)
 add_subdirectory(src)
+add_subdirectory(examples)
