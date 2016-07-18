@@ -12,7 +12,7 @@ After cmake runs, simply type 'make' and all files should be built.
 
 Once everything is built, go into the 'bin' folder and that's where the executable will be.
 
-If you'd like to run the tests, you will need to have srcML installed on your computer. It can be obtained here: http://www.srcml.org/downloads.html
+If you'd like to run the tests, you will need to have srcML installed on your computer. It can be obtained here: http://www.srcml.org/downloads.html -- make sure you use libsrcml.so as it is the only one that will work with the build script for srcType
 
 ***NOTICE***
 
