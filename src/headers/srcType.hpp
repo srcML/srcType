@@ -29,7 +29,7 @@ namespace srcTypeNS{
             }
             //Definition of find that uses the context (so it doesn't need to take a function name as context)
             DeclTypePolicy::DeclTypeData FindVariable(std::string varname) const{
-                auto it = data.variableMap.find(currentfilename + currentfunctionname + varname + std::to_string(currentline));
+                auto it = data.variableMap.find(currentfilename + varname + std::to_string(currentline));
                 if(it != data.variableMap.end()){
                     return it->second;
                 }

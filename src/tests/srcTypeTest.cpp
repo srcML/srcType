@@ -107,7 +107,7 @@ bool TestComplexType(){
     return true;
 }
 bool TestPrimitiveTypesMultiDecl(){
-    std::string str = "int main(){int c = 5, v = A, e = 5+c;}";
+    std::string str = "int main(){int c = 5, v = a, e = 5+c;}";
     std::string srcmlStr = StringToSrcML(str);
     
     try{
@@ -116,16 +116,19 @@ bool TestPrimitiveTypesMultiDecl(){
         {
             auto nameprofile = typeDict.FindVariable("c");
             std::cerr<<"Type1: "<< nameprofile.nameoftype<<std::endl;
+            assert(nameprofile.nameofidentifier == "c");
             assert(nameprofile.nameoftype == "int" && typeDict.IsPrimitive(nameprofile.nameoftype) == true);
         }
         {
             auto nameprofile = typeDict.FindVariable("v");
             std::cerr<<"Type2: "<< nameprofile.nameoftype<<std::endl;
+            assert(nameprofile.nameofidentifier == "v");
             assert(nameprofile.nameoftype == "int" && typeDict.IsPrimitive(nameprofile.nameoftype) == true);
         }
         {
             auto nameprofile = typeDict.FindVariable("e");
-            std::cerr<<"Type3: "<< nameprofile.nameofidentifier<<std::endl;
+            std::cerr<<"Type3: "<< nameprofile.nameoftype <<std::endl;
+            assert(nameprofile.nameofidentifier == "e");
             assert(nameprofile.nameoftype == "int" && typeDict.IsPrimitive(nameprofile.nameoftype) == true);
         }
     }catch(SAXError e){
