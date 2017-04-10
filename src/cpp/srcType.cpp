@@ -27,11 +27,11 @@ namespace srcTypeNS{
         //control.parse(&handler);
     }
     srcType::srcType(std::string buffer, const char* encoding = 0){
-        SrcTypePolicy* policy = new SrcTypePolicy();
+        srcTypePolicy* policy = new srcTypePolicy();
         srcSAXController control(buffer);
         srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
-        std::cerr<<"start parsing: "<<buffer<<std::endl;
         control.parse(&handler); //Start parsing
+        data = policy->GetDictionary(); 
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
         //srcSAXController control(file);
