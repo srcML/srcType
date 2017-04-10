@@ -1,5 +1,6 @@
 #include <srcTypeHandler.hpp>
 namespace srcTypeNS{
+/*
     void srcTypeHandler::GetTypedefNamePair(){
         //std::cerr<<ActualNameTNamePair.first<< " "<<lineNum<<std::endl;
     }
@@ -123,5 +124,5 @@ namespace srcTypeNS{
         classNameProfile.clear();
         currentDecl.first.clear();
     }
-
+*/
 }
