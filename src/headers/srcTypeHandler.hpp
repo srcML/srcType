@@ -33,7 +33,7 @@ namespace srcTypeNS{
                     for(auto param : functionsigdata.parameters){
                         srctypedata.paramMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + param.nameofidentifier + std::to_string(param.linenumber), param));
                     }
-                    srctypedata.functionMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name, functionsigdata));
+                    srctypedata.functionMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + functionsigdata., functionsigdata));
                 }
             }
         protected:
