@@ -21,31 +21,28 @@ namespace srcTypeNS{
             bool IsPrimitive(std::string type){
                 return cppPrimTypes.find(type) != cppPrimTypes.end();
             }
-            bool SetContext(std::string file, std::string function, unsigned int lineNumber){
+            bool SetContext(std::string file, std::string function){
                 currentfilename = file;
-                currentline = lineNumber;
                 currentfunctionname = function;
                 return true;
             }
             //Definition of find that uses the context (so it doesn't need to take a function name as context)
-            DeclTypePolicy::DeclTypeData FindVariable(std::string varname) const{
-                auto it = data.variableMap.find(currentfilename + varname + std::to_string(currentline));
+            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varname) const{
+                auto it = data.variableMap.find(currentfilename + currentfunctionname + varname);
                 if(it != data.variableMap.end()){
                     return it->second;
                 }
             }
-            /*
+            
             //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
-            std::pair<bool, SFunctionProfile> FindFunction(std::string funcname) const{
-                data.functionMap.find(funcname)
-                if(currentContext.ln == -1){
-                    throw std::runtime_error("Function Context not set");
+            // functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
+            std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>>::iterator FindFunction(std::string funcname, std::string types, bool isConst) {
+                std::cerr<<"SEARCHING: "<<funcname + types + std::to_string(isConst)<<std::endl;
+                auto it = data.functionMap.find(funcname + types + std::to_string(isConst));
+                if(it != data.functionMap.end()){
+                    return it;
                 }
-                FunctionVarMap::const_iterator fvmIt = dictionary.fvMap.find(currentContext.fileName+funcname+std::to_string(currentContext.ln));
-                if(fvmIt != dictionary.fvMap.end()){
-                    return std::make_pair(true, SFunctionProfile(fvmIt->second));
-                }
-                return std::make_pair(false, SFunctionProfile());
+                return data.functionMap.end();
             }
             /*
             //Definition of find that uses the context (so it doesn't need to take a function name as context)

@@ -12,9 +12,9 @@ namespace srcTypeNS{
     {
         public:
             struct srcTypeData{
-                std::unordered_map<std::string, ParamTypePolicy::ParamData> paramMap;
-                std::unordered_map<std::string, DeclTypePolicy::DeclTypeData> variableMap;
-                std::unordered_map<std::string, FunctionSignaturePolicy::SignatureData> functionMap;
+                std::unordered_map<std::string, std::vector<ParamTypePolicy::ParamData>> paramMap;
+                std::unordered_map<std::string, std::vector<DeclTypePolicy::DeclTypeData>> variableMap;
+                std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
             };
             srcTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners)
             {
@@ -26,20 +26,45 @@ namespace srcTypeNS{
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
                 using namespace srcSAXEventDispatch;
                 if(ctx.IsOpen(ParserState::declstmt)){
+                    //Grab data
                     decldata = *policy->Data<DeclTypePolicy::DeclTypeData>();
-                    //May want to get rid of line number and store right side of map as a set or something
-                    std::cerr<<"Hashing on: "<<ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier + std::to_string(decldata.linenumber);
-                    srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier + std::to_string(decldata.linenumber), decldata));
+
+                    //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
+                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier);
+                    if(declCheck == srctypedata.variableMap.end()){
+                        std::vector<DeclTypePolicy::DeclTypeData> decldatavec = {decldata};
+                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier, decldatavec));
+                    }else{
+                        declCheck->second.push_back(decldata);
+                    }
                 }else if(ctx.IsClosed(ParserState::declstmt)){
+                    //Grab data
                     functionsigdata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
                     std::string paramhash;
+                    
                     for(auto param : functionsigdata.parameters){
-                        srctypedata.paramMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + param.nameofidentifier, param));
+                        //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
+                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameoftype);
+                        if(paramCheck == srctypedata.paramMap.end()){
+                            std::vector<ParamTypePolicy::ParamData> paramdatavec = {param};
+                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameoftype, paramdatavec));
+                        }else{
+                            paramCheck->second.push_back(param);
+                        }
                         paramhash += param.nameoftype;
                     }
+                    
+                    //Generate a string to be hashed for the function
                     std::string fullhash = functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
-                    std::cerr<<"Hashing on: "<<fullhash<<std::endl;
-                    srctypedata.functionMap.insert(std::make_pair(fullhash, functionsigdata));
+                    std::cerr<<"THIS IS THE HASH: "<<fullhash<<std::endl;
+                    //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
+                    auto functionCheck = srctypedata.functionMap.find(fullhash);
+                    if(functionCheck == srctypedata.functionMap.end()){
+                        std::vector<FunctionSignaturePolicy::SignatureData> functionsigdatavec = {functionsigdata};
+                        srctypedata.functionMap.insert(std::make_pair(fullhash, functionsigdatavec));
+                    }else{
+                        functionCheck->second.push_back(functionsigdata);
+                    }
                 }
             }
             srcTypeData GetDictionary()const {
@@ -64,28 +89,20 @@ namespace srcTypeNS{
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
-                openEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"beg class"<<std::endl;
-                };
+                openEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
                 openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"add func"<<std::endl;
                     ctx.dispatcher->AddListenerDispatch(&functionpolicy);
                 };
                 openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"add decl"<<std::endl;
                     ctx.dispatcher->AddListenerDispatch(&declpolicy);
                 };
                 closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"Rem decl"<<std::endl;
                     ctx.dispatcher->RemoveListenerDispatch(&declpolicy);
                 };
                 openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"Reem func"<<std::endl;
                     ctx.dispatcher->RemoveListenerDispatch(&functionpolicy);
                 };
-                closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"end class"<<std::endl;
-                };
+                closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
             }
     };
 };
