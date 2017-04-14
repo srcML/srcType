@@ -206,6 +206,7 @@ bool TestFindFunction(){
     if(findFunc != typeDict.data.functionMap.end()){
         FunctionSignaturePolicy::SignatureData functiondata = findFunc->second.front();
         assert(functiondata.name == "Foo");
+        assert(functiondata.returnType == "string");
         assert(typeDict.IsPrimitive(functiondata.returnType) == false);
     }else{
         assert(false);
@@ -228,27 +229,19 @@ bool TestNamespacedTypedefedType(){
 }
 
 
-bool TestFindFunction(){
-    std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
-    std::string srcmlStr = StringToSrcML(str);
-    
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
-    typeDict.SetFunctionContext("testsrcType.cpp");
-    auto functoinprofile = typeDict.FindFunction("Foo");
-    assert(functoinprofile.name == "Foo");
-    assert(functoinprofile.isPrimitive == false);
-}
 */
 int main(int argc, char** argv){
-    TestPrimitiveTypes();
-    TestComplexType();
-    TestNamespacedComplexType();
-    //TestNamespacedTypedefedType();
-    TestPrimitiveTypesMultiDecl();
-    TestFunctionAndReturnTypeID();
-    TestFindFunction();
-    //srcTypeNS::srcType typeDict;
-    //typeDict.ReadArchiveFile(argv[1]);
+    //TestPrimitiveTypes();
+    //TestComplexType();
+    //TestNamespacedComplexType();
+    ////TestNamespacedTypedefedType();
+    //TestPrimitiveTypesMultiDecl();
+    //TestFunctionAndReturnTypeID();
+    //TestFindFunction();
+    std::cerr<<"start"<<std::endl;
+    srcTypeNS::srcType typeDict;
+    typeDict.ReadArchiveFile(argv[1]);
+    std::cerr<<"finish"<<std::endl;
     //typeDict.SerializeMap(SerializeToCppUMap);
     //std::cerr<<typeDict.size();
 }

@@ -37,7 +37,6 @@ namespace srcTypeNS{
             //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
             // functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
             std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>>::iterator FindFunction(std::string funcname, std::string types, bool isConst) {
-                std::cerr<<"SEARCHING: "<<funcname + types + std::to_string(isConst)<<std::endl;
                 auto it = data.functionMap.find(funcname + types + std::to_string(isConst));
                 if(it != data.functionMap.end()){
                     return it;

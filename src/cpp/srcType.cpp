@@ -44,6 +44,14 @@ namespace srcTypeNS{
         //control.parse(&handler);
     }
     void srcType::ReadArchiveFile(std::string filename){
+        srcTypePolicy* policy = new srcTypePolicy();
+        srcSAXController control(filename.c_str());
+        srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
+        control.parse(&handler); //Start parsing
+        data = policy->GetDictionary(); 
+        std::cerr<<data.paramMap.size()<<std::endl;
+        std::cerr<<data.functionMap.size()<<std::endl;;
+        std::cerr<<data.variableMap.size()<<std::endl;;
         //srcSAXController control(filename.c_str());
         //srcTypeHandler handler(&dictionary);
         //control.parse(&handler); 

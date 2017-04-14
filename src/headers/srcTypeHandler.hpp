@@ -56,7 +56,7 @@ namespace srcTypeNS{
                     
                     //Generate a string to be hashed for the function
                     std::string fullhash = functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
-                    std::cerr<<"THIS IS THE HASH: "<<fullhash<<std::endl;
+                    
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto functionCheck = srctypedata.functionMap.find(fullhash);
                     if(functionCheck == srctypedata.functionMap.end()){
@@ -89,7 +89,7 @@ namespace srcTypeNS{
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
-                openEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
+               // openEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
                 openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
                     ctx.dispatcher->AddListenerDispatch(&functionpolicy);
                 };
@@ -102,7 +102,7 @@ namespace srcTypeNS{
                 openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){
                     ctx.dispatcher->RemoveListenerDispatch(&functionpolicy);
                 };
-                closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
+                //closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
             }
     };
 };
