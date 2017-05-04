@@ -184,7 +184,7 @@ bool TestFunctionAndReturnTypeID(){
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
-    auto findFunc = typeDict.FindFunction("Foo", "intdouble", 0);
+    auto findFunc = typeDict.FindFunction("Foo", "intdouble", false);
     if(findFunc != typeDict.data.functionMap.end()){
         FunctionSignaturePolicy::SignatureData functiondata = findFunc->second.front();
         assert(functiondata.name == "Foo");
@@ -192,6 +192,7 @@ bool TestFunctionAndReturnTypeID(){
         assert(functiondata.returnTypeNamespaces.front() == "std");
         assert(functiondata.functionNamespaces.front() == "srcTypeNS");
     }else{
+        std::cerr<<"Did not find function with name: Foo";
         assert(false);
     }
 
@@ -202,13 +203,14 @@ bool TestFindFunction(){
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
-    auto findFunc = typeDict.FindFunction("Foo", "", 0);
+    auto findFunc = typeDict.FindFunction("Foo", "", false);
     if(findFunc != typeDict.data.functionMap.end()){
         FunctionSignaturePolicy::SignatureData functiondata = findFunc->second.front();
         assert(functiondata.name == "Foo");
         assert(functiondata.returnType == "string");
         assert(typeDict.IsPrimitive(functiondata.returnType) == false);
     }else{
+        std::cerr<<"Did not find function with name: Foo";
         assert(false);
     }
 }
@@ -231,17 +233,16 @@ bool TestNamespacedTypedefedType(){
 
 */
 int main(int argc, char** argv){
-    //TestPrimitiveTypes();
-    //TestComplexType();
-    //TestNamespacedComplexType();
-    ////TestNamespacedTypedefedType();
-    //TestPrimitiveTypesMultiDecl();
-    //TestFunctionAndReturnTypeID();
-    //TestFindFunction();
-    std::cerr<<"start"<<std::endl;
-    srcTypeNS::srcType typeDict;
-    typeDict.ReadArchiveFile(argv[1]);
-    std::cerr<<"finish"<<std::endl;
+    TestPrimitiveTypes();
+    TestComplexType();
+    TestNamespacedComplexType();
+    //TestNamespacedTypedefedType();
+    TestPrimitiveTypesMultiDecl();
+    TestFunctionAndReturnTypeID();
+    TestFindFunction();
+    //srcTypeNS::srcType typeDict;
+    //typeDict.ReadArchiveFile(argv[1]);
+    
     //typeDict.SerializeMap(SerializeToCppUMap);
     //std::cerr<<typeDict.size();
 }
