@@ -3,7 +3,8 @@
 
 #include <srcTypeHandler.hpp>
 #include <srcSAXController.hpp>
-#include <iostream> 
+#include <stdexcept>
+#include <iostream>
 
 namespace srcTypeNS{
     class srcType{
@@ -26,66 +27,25 @@ namespace srcTypeNS{
                 currentfunctionname = function;
                 return true;
             }
-            //Definition of find that uses the context (so it doesn't need to take a function name as context)
+            //Assumes context was set
             std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varname) const{
                 auto it = data.variableMap.find(currentfilename + currentfunctionname + varname);
+                //std::cerr<<data.variableMap.size();
                 if(it != data.variableMap.end()){
                     return it->second;
+                }else{
+                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varname);
                 }
             }
-            
-            //Definition of find that assumes the user didn't give a context (They should just give a context, though, tbh).
-            // functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
-            std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>>::iterator FindFunction(std::string funcname, std::string types, bool isConst) {
+            //Assumes context was set
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcname, std::string types, bool isConst) {
                 auto it = data.functionMap.find(funcname + types + std::to_string(isConst));
                 if(it != data.functionMap.end()){
-                    return it;
-                }
-                return data.functionMap.end();
-            }
-            /*
-            //Definition of find that uses the context (so it doesn't need to take a function name as context)
-            std::pair<bool, VariableProfile> FindVariable(std::string varname) const{
-                if(!currentContext.IsSet()){
-                    throw std::runtime_error("Function Context not set"); //for now, std exception
+                    return it->second;
                 }else{
-                    VarTypeMap::const_iterator it = currentContext.currentFunc->second.vtMap.find(varname+std::to_string(currentContext.ln));
-                    if(it != currentContext.currentFunc->second.vtMap.end()){
-                        return std::make_pair(true, it->second);
-                    }
-                    return std::make_pair(false, VariableProfile());
+                    throw std::runtime_error("Coud not find function with key: " + funcname+" "+types+" "+std::to_string(isConst));
                 }
             }
-            bool Insert(std::string funcname, const VariableProfile& np){
-                FunctionVarMap::iterator fvmIt = dictionary.fvMap.find(funcname);
-                if(fvmIt != dictionary.fvMap.end()){
-                    VarTypeMap::iterator vtmIt = fvmIt->second.vtMap.find(np.name+std::to_string(np.linenumber));
-                    if(vtmIt != fvmIt->second.vtMap.end()){
-                        vtmIt->second = np;
-                        return true;
-                    }else{
-                        fvmIt->second.vtMap.insert(std::make_pair(np.name, np));
-                        return true;
-                    }
-                }
-                return false;
-            }
-            bool Insert(const VariableProfile& np){
-                if(currentContext.ln == -1){
-                    throw std::runtime_error("Context not set"); //for now, std exception
-                }else{
-                    auto it = currentContext.currentFunc->second.vtMap.find(np.name+std::to_string(np.linenumber));
-                    if(it != currentContext.currentFunc->second.vtMap.end()){
-                        it->second = np;
-                        return true;
-                    }else{
-                        currentContext.currentFunc->second.vtMap.insert(std::make_pair(np.name, np));
-                        return true;
-                    }
-                }
-                return false;
-            }
-    */
     };
 }
 #endif

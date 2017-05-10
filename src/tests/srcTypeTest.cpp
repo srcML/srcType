@@ -2,7 +2,7 @@
 #include <iostream>
 #include <srcml.h>
 #include <cassert>
-
+#include <stdexcept>
 /// <summary>
 /// Utility function that trims from the right of a string. For now it's just solving a weird issue with srcML
 /// and garbage text ending up at the end of the cstring it returns.
@@ -76,6 +76,8 @@ bool TestPrimitiveTypes(){
         }
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
     }
     return true;
 }
@@ -108,6 +110,8 @@ bool TestComplexType(){
         }
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
     }
     return true;
 }
@@ -141,6 +145,8 @@ bool TestPrimitiveTypesMultiDecl(){
         }
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
     }
     return true;
 }
@@ -176,6 +182,8 @@ bool TestNamespacedComplexType(){
         }
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
     }
     return true;
 }
@@ -184,33 +192,47 @@ bool TestFunctionAndReturnTypeID(){
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
-    auto findFunc = typeDict.FindFunction("Foo", "intdouble", false);
-    if(findFunc != typeDict.data.functionMap.end()){
-        FunctionSignaturePolicy::SignatureData functiondata = findFunc->second.front();
-        assert(functiondata.name == "Foo");
-        assert(functiondata.returnType == "string");
-        assert(functiondata.returnTypeNamespaces.front() == "std");
-        assert(functiondata.functionNamespaces.front() == "srcTypeNS");
-    }else{
-        std::cerr<<"Did not find function with name: Foo";
+    try{
+        auto findFunc = typeDict.FindFunction("Foo", "intdouble", false);
+        assert(findFunc.front().name == "Foo");
+        assert(findFunc.front().returnType == "string");
+        assert(findFunc.front().returnTypeNamespaces.front() == "std");
+        assert(findFunc.front().functionNamespaces.front() == "srcTypeNS");
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
         assert(false);
     }
 
     return true;
 }
-bool TestFindFunction(){
+bool TestFindNoArgFunction(){
     std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
-    auto findFunc = typeDict.FindFunction("Foo", "", false);
-    if(findFunc != typeDict.data.functionMap.end()){
-        FunctionSignaturePolicy::SignatureData functiondata = findFunc->second.front();
-        assert(functiondata.name == "Foo");
-        assert(functiondata.returnType == "string");
-        assert(typeDict.IsPrimitive(functiondata.returnType) == false);
-    }else{
+    try{
+        auto findFunc = typeDict.FindFunction("Foo", "", false);
+        assert(findFunc.front().name == "Foo");
+        assert(findFunc.front().returnType == "string");
+        assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
+    }catch(std::runtime_error e){
         std::cerr<<"Did not find function with name: Foo";
+        assert(false);
+    }
+
+}
+bool TestFindMultiArgFunction(){
+    std::string str = "std::string Foo(string abc, std::string onetwothree, std::vector<std::string> blee){static const std::Object caa34 = 5;}";
+    std::string srcmlStr = StringToSrcML(str);
+    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    
+    try{
+        auto findFunc = typeDict.FindFunction("Foo", "stringstd::stringstd::vector<std::string>", false);
+        assert(findFunc.front().name == "Foo");
+        assert(findFunc.front().returnType == "string");
+        assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
         assert(false);
     }
 }
@@ -236,10 +258,11 @@ int main(int argc, char** argv){
     TestPrimitiveTypes();
     TestComplexType();
     TestNamespacedComplexType();
-    //TestNamespacedTypedefedType();
     TestPrimitiveTypesMultiDecl();
     TestFunctionAndReturnTypeID();
-    TestFindFunction();
+    TestFindNoArgFunction();
+    TestFindMultiArgFunction();
+    //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);
     
