@@ -18,31 +18,38 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include <srcType.hpp>
+#include <srcTypeHandler.hpp>
 namespace srcTypeNS{
     srcType::srcType(){} 
     srcType::srcType(const char* filename, const char* encoding = 0){
+        srcTypePolicy* policy = new srcTypePolicy();
         srcSAXController control(filename);
-        srcTypeHandler handler(&dictionary);
-        control.parse(&handler);
+        srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
+        control.parse(&handler); //Start parsing
+        data = policy->GetDictionary();
     }
     srcType::srcType(std::string buffer, const char* encoding = 0){
+        srcTypePolicy* policy = new srcTypePolicy();
         srcSAXController control(buffer);
-        srcTypeHandler handler(&dictionary);
-        control.parse(&handler);
+        srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
+        control.parse(&handler); //Start parsing
+        data = policy->GetDictionary(); 
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
-        srcSAXController control(file);
-        srcTypeHandler handler(&dictionary);
-        control.parse(&handler);
+        //srcSAXController control(file);
+        //srcTypeHandler handler(&dictionary);
+        //control.parse(&handler);
     }
     srcType::srcType(int fd, const char* encoding = 0){
-        srcSAXController control(fd);
-        srcTypeHandler handler(&dictionary);
-        control.parse(&handler);
+        //srcSAXController control(fd);
+        //srcTypeHandler handler(&dictionary);
+        //control.parse(&handler);
     }
     void srcType::ReadArchiveFile(std::string filename){
+        srcTypePolicy* policy = new srcTypePolicy();
         srcSAXController control(filename.c_str());
-        srcTypeHandler handler(&dictionary);
-        control.parse(&handler); 
+        srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
+        control.parse(&handler); //Start parsing
+        data = policy->GetDictionary();
     }
 }
