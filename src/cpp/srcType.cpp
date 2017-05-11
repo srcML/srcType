@@ -1,5 +1,5 @@
 /**
- * @file element_count.hpp
+ * @file srcType.cpp
  *
  * @copyright Copyright (C) 2013-2014  SDML (www.srcML.org)
  *
