@@ -28,22 +28,31 @@ namespace srcTypeNS{
                 return true;
             }
             //Assumes context was set
-            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varname) const{
-                auto it = data.variableMap.find(currentfilename + currentfunctionname + varname);
-                //std::cerr<<data.variableMap.size();
+            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varName) const{
+                auto it = data.variableMap.find(currentfilename + currentfunctionname + varName);
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varname);
+                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName);
                 }
             }
-            //Assumes context was set
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcname, std::string types, bool isConst) {
-                auto it = data.functionMap.find(funcname + types + std::to_string(isConst));
+
+            //Does not use context
+            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varName, std::string functionName, std::string fileName) const{
+                auto it = data.variableMap.find(fileName + functionName + varName);
+                if(it != data.variableMap.end()){
+                    return it->second;
+                }else{
+                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName);
+                }
+            }
+
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, std::string types, bool isConst) {
+                auto it = data.functionMap.find(funcName + types + std::to_string(isConst));
                 if(it != data.functionMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find function with key: " + funcname+" "+types+" "+std::to_string(isConst));
+                    throw std::runtime_error("Coud not find function with key: " + funcName+" "+types+" "+std::to_string(isConst));
                 }
             }
     };
