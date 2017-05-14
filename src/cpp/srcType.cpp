@@ -19,6 +19,7 @@
  */
 #include <srcType.hpp>
 #include <srcTypeHandler.hpp>
+#include <srcTypeInferencePolicy.hpp>
 namespace srcTypeNS{
     srcType::srcType(){} 
     srcType::srcType(const char* filename, const char* encoding = 0){
@@ -29,11 +30,14 @@ namespace srcTypeNS{
         data = policy->GetDictionary();
     }
     srcType::srcType(std::string buffer, const char* encoding = 0){
-        srcTypePolicy* policy = new srcTypePolicy();
+        srcTypePolicy* srcTypepol = new srcTypePolicy();
         srcSAXController control(buffer);
-        srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
-        control.parse(&handler); //Start parsing
-        data = policy->GetDictionary(); 
+        srcSAXEventDispatch::srcSAXEventDispatcher<> srcTypehandler {srcTypepol};
+        control.parse(&srcTypehandler); //Start parsing
+        data = srcTypepol->GetDictionary();
+        delete srcTypepol; 
+        srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy();
+        srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler {srcTypeInferencePol};
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
         //srcSAXController control(file);
