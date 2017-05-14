@@ -212,7 +212,7 @@ bool TestFunctionAndReturnTypeID(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo", "intdouble", false);
+        auto findFunc = typeDict.FindFunction("Foo");
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(findFunc.front().returnTypeNamespaces.front() == "std");
@@ -230,10 +230,29 @@ bool TestFindNoArgFunction(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo", "", false);
+        auto findFunc = typeDict.FindFunction("Foo");
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
+    }catch(std::runtime_error e){
+        std::cerr<<"Did not find function with name: Foo";
+        assert(false);
+    }
+}
+bool TestFindMutliNoArgFunction(){
+    std::string str = "std::string Foo(){return \"hi\";} std::string Foo(){return \"hi\";}";
+    std::string srcmlStr = StringToSrcML(str);
+    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    
+    try{
+        auto findFunc = typeDict.FindFunction("Foo");
+        assert(findFunc.size() == 2);
+        assert(findFunc.at(0).name == "Foo");
+        assert(findFunc.at(0).returnType == "string");
+        assert(typeDict.IsPrimitive(findFunc.at(0).returnType) == false);
+        assert(findFunc.at(1).name == "Foo");
+        assert(findFunc.at(1).returnType == "string");
+        assert(typeDict.IsPrimitive(findFunc.at(1).returnType) == false);
     }catch(std::runtime_error e){
         std::cerr<<"Did not find function with name: Foo";
         assert(false);
@@ -246,7 +265,7 @@ bool TestFindMultiArgFunction(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo", "stringstd::stringstd::vector<std::string>", false);
+        auto findFunc = typeDict.FindFunction("Foo");
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
@@ -281,6 +300,7 @@ int main(int argc, char** argv){
     TestFunctionAndReturnTypeID();
     TestFindNoArgFunction();
     TestFindMultiArgFunction();
+    TestFindMutliNoArgFunction();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);

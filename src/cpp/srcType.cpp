@@ -35,9 +35,9 @@ namespace srcTypeNS{
         srcSAXEventDispatch::srcSAXEventDispatcher<> srcTypehandler {srcTypepol};
         control.parse(&srcTypehandler); //Start parsing
         data = srcTypepol->GetDictionary();
-        delete srcTypepol; 
-        srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy();
-        srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler {srcTypeInferencePol};
+        //delete srcTypepol; 
+        //srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy();
+        //srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler {srcTypeInferencePol};
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
         //srcSAXController control(file);

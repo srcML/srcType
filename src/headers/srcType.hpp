@@ -66,12 +66,13 @@ namespace srcTypeNS{
                 }
             }
 
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, std::string types, bool isConst) {
-                auto it = data.functionMap.find(funcName + types + std::to_string(isConst));
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName) {
+                std::cerr<<"Looking for: "<<funcName<<std::endl;
+                auto it = data.functionMap.find(funcName);
                 if(it != data.functionMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find function with key: " + funcName+" "+types+" "+std::to_string(isConst));
+                    throw std::runtime_error("Coud not find function with key: " + funcName);
                 }
             }
     };

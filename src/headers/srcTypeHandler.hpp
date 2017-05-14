@@ -74,7 +74,7 @@ namespace srcTypeNS{
                     }
                     
                     //Generate a string to be hashed for the function
-                    std::string fullhash = functionsigdata.name + paramhash + std::to_string(functionsigdata.isConst);
+                    std::string fullhash = functionsigdata.name;
                     
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto functionCheck = srctypedata.functionMap.find(fullhash);
