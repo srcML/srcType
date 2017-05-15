@@ -31,7 +31,7 @@ namespace srcTypeNS{
             unsigned int currentline;
             std::string currentfilename;
             std::string currentfunctionname;
-            srcTypePolicy::srcTypeData data;
+            srcTypeData data;
             srcType();
             srcType(const char*, const char*);
             srcType(std::string, const char*);

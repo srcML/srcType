@@ -27,14 +27,14 @@
 #include <srcSAXEventDispatcher.hpp>
 #include <FunctionSignaturePolicy.hpp>
 namespace srcTypeNS{
+    struct srcTypeData{
+        std::unordered_map<std::string, std::vector<ParamTypePolicy::ParamData>> paramMap;
+        std::unordered_map<std::string, std::vector<DeclTypePolicy::DeclTypeData>> variableMap;
+        std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
+    };
     class srcTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
         public:
-            struct srcTypeData{
-                std::unordered_map<std::string, std::vector<ParamTypePolicy::ParamData>> paramMap;
-                std::unordered_map<std::string, std::vector<DeclTypePolicy::DeclTypeData>> variableMap;
-                std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
-            };
             srcTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners)
             {
                 InitializeEventHandlers();

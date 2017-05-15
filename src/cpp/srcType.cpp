@@ -36,8 +36,10 @@ namespace srcTypeNS{
         control.parse(&srcTypehandler); //Start parsing
         data = srcTypepol->GetDictionary();
         //delete srcTypepol; 
-        //srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy();
-        //srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler {srcTypeInferencePol};
+        srcSAXController infcontrol(buffer);
+        srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy(this);
+        srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler {srcTypeInferencePol};
+        infcontrol.parse(&Inferencehandler);
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
         //srcSAXController control(file);

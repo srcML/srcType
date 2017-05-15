@@ -240,7 +240,7 @@ bool TestFindNoArgFunction(){
     }
 }
 bool TestFindMutliNoArgFunction(){
-    std::string str = "std::string Foo(){return \"hi\";} std::string Foo(){return \"hi\";}";
+    std::string str = "std::string Bar(){return \"hi\";} std::string Foo(){return \"hi\";} std::string Foo(){return \"hi\";}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
@@ -274,6 +274,11 @@ bool TestFindMultiArgFunction(){
         assert(false);
     }
 }
+bool TestCollectCallData(){
+    std::string str = "std::string Foo(){Foo();}";
+    std::string srcmlStr = StringToSrcML(str);
+    srcTypeNS::srcType typeDict(srcmlStr, 0);
+}
 /*
 bool TestTypedefedType(){
     return true;
@@ -301,6 +306,7 @@ int main(int argc, char** argv){
     TestFindNoArgFunction();
     TestFindMultiArgFunction();
     TestFindMutliNoArgFunction();
+    TestCollectCallData();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);

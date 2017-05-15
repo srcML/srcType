@@ -21,7 +21,7 @@
 #define SRCTYPEINFERENCEINCLUDE
 #include <exception>
 #include <unordered_map>
-#include <srcSAXHandler.hpp>
+#include <srcType.hpp>
 #include <srcSAXEventDispatcher.hpp>
 #include <FunctionCallPolicy.hpp>
 namespace srcTypeNS{
@@ -29,10 +29,13 @@ namespace srcTypeNS{
     {
         public:
             struct srcTypeInferenceData{
-
+                std::string name;
             };
-            srcTypeInferencePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners)
+            srcTypeInferenceData data;
+            srcType * const dictionary;
+            srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
             {
+                
                 InitializeEventHandlers();
                 //declpolicy.AddListener(this);
                 //functionpolicy.AddListener(this);
@@ -52,7 +55,16 @@ namespace srcTypeNS{
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
-
+                closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
+                    std::cerr<<"enter call"<<std::endl;
+                };
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
+                    if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                        data.name = ctx.currentToken;
+                        auto foo = dictionary->FindFunction(data.name);
+                        std::cerr<<foo.front().returnType<<std::endl;
+                    }
+                };
             }
     };
 };
