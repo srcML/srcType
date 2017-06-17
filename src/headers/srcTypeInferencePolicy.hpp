@@ -30,6 +30,7 @@ namespace srcTypeNS{
         public:
             struct srcTypeInferenceData{
                 std::string name;
+                std::vector<std::string> argumentTypes;
             };
             srcTypeInferenceData data;
             srcType * const dictionary;
@@ -55,14 +56,26 @@ namespace srcTypeNS{
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
-                closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"enter call"<<std::endl;
+                closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
+                    
+                    std::cerr<<"exit argument: "<<ctx.currentToken<<std::endl;
+                    try{
+                        auto var = dictionary->FindParam(ctx.currentToken, data.name, "testsrcType.cpp");
+                        std::cerr<<"TYPE: "<<var.at(0).nameoftype<<std::endl;
+
+                    }catch(std::runtime_error e){
+                        std::cerr<<e.what();
+                    }
                 };
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                         data.name = ctx.currentToken;
-                        auto foo = dictionary->FindFunction(data.name);
-                        std::cerr<<foo.front().returnType<<std::endl;
+                        try{
+                            auto foo = dictionary->FindFunction(data.name);
+                            std::cerr<<foo.front().returnType<<std::endl;
+                        }catch(std::runtime_error e){
+                            std::cerr<<e.what();
+                        }
                     }
                 };
             }

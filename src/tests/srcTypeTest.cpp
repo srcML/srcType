@@ -275,9 +275,15 @@ bool TestFindMultiArgFunction(){
     }
 }
 bool TestCollectCallData(){
-    std::string str = "std::string Foo(){Foo();}";
-    std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    try{
+        std::cerr<<"TEST COLLECT"<<std::endl;
+        std::string str = "std::string Foo(int a, double b, std::string c){Foo(a, b, c);}";
+        std::string srcmlStr = StringToSrcML(str);
+        srcTypeNS::srcType typeDict(srcmlStr, 0);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+        assert(false);
+    }
 }
 /*
 bool TestTypedefedType(){

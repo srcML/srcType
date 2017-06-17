@@ -65,6 +65,7 @@ namespace srcTypeNS{
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                         auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameoftype);
                         if(paramCheck == srctypedata.paramMap.end()){
+                            std::cerr<<"Pushing: "<< functionsigdata.name <<" "<< param.nameoftype<<std::endl;
                             std::vector<ParamTypePolicy::ParamData> paramdatavec = {param};
                             srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameoftype, paramdatavec));
                         }else{
