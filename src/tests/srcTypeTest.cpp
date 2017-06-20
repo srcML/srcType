@@ -212,7 +212,7 @@ bool TestFunctionAndReturnTypeID(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo");
+        auto findFunc = typeDict.FindFunction("Foo", 2);
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(findFunc.front().returnTypeNamespaces.front() == "std");
@@ -230,7 +230,7 @@ bool TestFindNoArgFunction(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo");
+        auto findFunc = typeDict.FindFunction("Foo", 0);
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
@@ -245,7 +245,7 @@ bool TestFindMutliNoArgFunction(){
     srcTypeNS::srcType typeDict(srcmlStr, 0);
     
     try{
-        auto findFunc = typeDict.FindFunction("Foo");
+        auto findFunc = typeDict.FindFunction("Foo", 0);
         assert(findFunc.size() == 2);
         assert(findFunc.at(0).name == "Foo");
         assert(findFunc.at(0).returnType == "string");
@@ -263,9 +263,8 @@ bool TestFindMultiArgFunction(){
     std::string str = "std::string Foo(string abc, std::string onetwothree, std::vector<std::string> blee){static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, 0);
-    
     try{
-        auto findFunc = typeDict.FindFunction("Foo");
+        auto findFunc = typeDict.FindFunction("Foo", 3);
         assert(findFunc.front().name == "Foo");
         assert(findFunc.front().returnType == "string");
         assert(typeDict.IsPrimitive(findFunc.front().returnType) == false);
@@ -276,8 +275,7 @@ bool TestFindMultiArgFunction(){
 }
 bool TestCollectCallData(){
     try{
-        std::cerr<<"TEST COLLECT"<<std::endl;
-        std::string str = "std::string Foo(int a, double b, std::string c){Foo(a, b, c);}";
+        std::string str = "std::string Boo(int a, double b){} std::string Foo(int a, double b, std::string c){Boo(a, b);}";
         std::string srcmlStr = StringToSrcML(str);
         srcTypeNS::srcType typeDict(srcmlStr, 0);
     }catch(std::runtime_error e){

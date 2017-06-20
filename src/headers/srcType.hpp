@@ -52,8 +52,9 @@ namespace srcTypeNS{
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
+                    throw std::runtime_error("Could not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
                 }
+                return std::vector<DeclTypePolicy::DeclTypeData>();
             }
 
             //Does not use context
@@ -62,27 +63,34 @@ namespace srcTypeNS{
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
+                    throw std::runtime_error("Could not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
                 }
+                return std::vector<DeclTypePolicy::DeclTypeData>();
             }
 
             //Does not use context
-            std::vector<ParamTypePolicy::ParamData> FindParam(std::string varName, std::string functionName, std::string fileName) const{
-                auto it = data.paramMap.find(fileName + functionName + varName);
+            std::vector<ParamTypePolicy::ParamData> FindParam(std::string varName, std::string functionName) const{
+                auto it = data.paramMap.find(functionName + varName);
                 if(it != data.paramMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Coud not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
+                    throw std::runtime_error("Could not find parameter with key: " + functionName+" Name: "+varName + "\n");
                 }
+                return std::vector<ParamTypePolicy::ParamData>();
             }
 
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName) {
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, int numParams) {
+                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);
-                std::cerr<<"Looking for: "<<funcName<<std::endl;
                 if(it != data.functionMap.end()){
-                    return it->second;
+                    for(auto func : it->second){
+                        if(func.parameters.size() == numParams){
+                            resultVec.push_back(func);
+                        }
+                    }
+                    return resultVec;
                 }else{
-                    throw std::runtime_error("Coud not find function with key: " + funcName + "\n");
+                    throw std::runtime_error("Could not find function with key: " + funcName + "\n");
                 }
                 return std::vector<FunctionSignaturePolicy::SignatureData>();
             }

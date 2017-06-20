@@ -63,15 +63,14 @@ namespace srcTypeNS{
                     
                     for(auto param : functionsigdata.parameters){
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameoftype);
+                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameofidentifier);
                         if(paramCheck == srctypedata.paramMap.end()){
-                            std::cerr<<"Pushing: "<< functionsigdata.name <<" "<< param.nameoftype<<std::endl;
                             std::vector<ParamTypePolicy::ParamData> paramdatavec = {param};
-                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameoftype, paramdatavec));
+                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameofidentifier, paramdatavec));
                         }else{
                             paramCheck->second.push_back(param);
                         }
-                        paramhash += param.nameoftype;
+                        paramhash += param.nameofidentifier;
                     }
                     
                     //Generate a string to be hashed for the function
