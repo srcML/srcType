@@ -275,7 +275,7 @@ bool TestFindMultiArgFunction(){
 }
 bool TestCollectCallData(){
     try{
-        std::string str = "std::string Boo(int a, double b){} std::string Foo(int a, double b, std::string c){Boo(a, b);}";
+        std::string str = "std::string Boo(int a, double b){} std::string Boo(int a, int b){} double Boo(int a, double b, int c){} std::string Foo(int a, double b, std::string c){int c; double d; Boo(c, d, c);}";
         std::string srcmlStr = StringToSrcML(str);
         srcTypeNS::srcType typeDict(srcmlStr, 0);
     }catch(std::runtime_error e){

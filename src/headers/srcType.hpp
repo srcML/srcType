@@ -63,7 +63,7 @@ namespace srcTypeNS{
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
-                    throw std::runtime_error("Could not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
+                    throw std::runtime_error("Could not find variable with key: file: " + fileName+" func: "+functionName+" Id: "+varName + "\n");
                 }
                 return std::vector<DeclTypePolicy::DeclTypeData>();
             }
@@ -78,6 +78,7 @@ namespace srcTypeNS{
                 }
                 return std::vector<ParamTypePolicy::ParamData>();
             }
+            
 
             std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, int numParams) {
                 std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
@@ -86,6 +87,31 @@ namespace srcTypeNS{
                     for(auto func : it->second){
                         if(func.parameters.size() == numParams){
                             resultVec.push_back(func);
+                        }
+                    }
+                    return resultVec;
+                }else{
+                    throw std::runtime_error("Could not find function with key: " + funcName + "\n");
+                }
+                return std::vector<FunctionSignaturePolicy::SignatureData>();
+            }
+
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<DeclTypePolicy::DeclTypeData>& callParams) {
+                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
+                auto it = data.functionMap.find(funcName);
+                std::string callparamtypes, currentparamtypes;
+                if(it != data.functionMap.end()){
+                    for(auto func : it->second){
+                        if(func.parameters.size() == callParams.size()){
+                            for(unsigned int i = 0; i< func.parameters.size(); ++i){
+                                callparamtypes += callParams.at(i).nameoftype;
+                                currentparamtypes+=func.parameters.at(i).nameoftype;
+                            }
+                            if(callparamtypes == currentparamtypes){
+                                resultVec.push_back(func);
+                            }
+                            callparamtypes.clear();
+                            currentparamtypes.clear();
                         }
                     }
                     return resultVec;

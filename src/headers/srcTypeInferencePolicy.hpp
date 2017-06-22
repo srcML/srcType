@@ -25,16 +25,20 @@
 #include <srcSAXEventDispatcher.hpp>
 #include <FunctionCallPolicy.hpp>
 namespace srcTypeNS{
+    struct srcTypeInferenceData{
+        srcTypeInferenceData(std::string nme, std::string rtype){
+            name = nme;
+            type = rtype;
+        }
+        std::string name;
+        std::string type;
+    };
     class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
         public:
-            struct srcTypeInferenceData{
-                std::string name;
-                std::vector<std::string> argumentTypes;
-            };
-            srcTypeInferenceData data;
-            std::vector<ParamTypePolicy::ParamData> currentParameters;
-            std::string currentFunction;
+            std::list<srcTypeInferenceData> data;
+            std::vector<DeclTypePolicy::DeclTypeData> currentParameters;
+            std::string currentFunctionCall, currentFunctionName, argumentexpr;
             srcType * const dictionary;
             srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
             {
@@ -50,24 +54,23 @@ namespace srcTypeNS{
             }
         protected:
             void *DataInner() const override {
-                //return new srcTypeData(srctypedata);
+                return new std::list<srcTypeInferenceData>(data);
             }
             
         private:
-
-            
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
-                    try{
-                        auto var = dictionary->FindParam(data.name, currentFunction);
-                        currentParameters.push_back(var.at(0));
-
-                    }catch(std::runtime_error e){
-                        std::cerr<<e.what();
+                        try{
+                            auto var = dictionary->FindVariable(argumentexpr, currentFunctionName, "testsrcType.cpp");
+                            currentParameters.push_back(var.at(0));
+    
+                        }catch(std::runtime_error e){
+                            std::cerr<<e.what();
+                        }
+                        argumentexpr.clear();
                     }
-                }
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
@@ -76,23 +79,25 @@ namespace srcTypeNS{
                             hash += param.nameoftype;
                         }
                     }
-                };
-                closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
-                        std::cerr<<"Found: "<<currentFunction<<" "<<ctx.currentToken<<std::endl;
-                        auto func = dictionary->FindFunction(currentFunction, currentParameters.size());
+                        const int ONLY_ONE_FUNCTION_IN_RESULT = 1;
+                        auto func = dictionary->FindFunction(currentFunctionCall, currentParameters);
+                        if(func.size() == ONLY_ONE_FUNCTION_IN_RESULT){
+                            data.push_back(srcTypeInferenceData(func.at(0).name, func.at(0).returnType));
+                        }
                         std::cerr<<func.size();
                     }
                 };
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
-                    if(ctx.And({ParserState::name, ParserState::call}) && ctx.Nand({ParserState::genericargumentlist, ParserState::argumentlist})){
-                        std::cerr<<"New func call" << ctx.currentToken<<std::endl;
-                        currentFunction = ctx.currentToken;
+                    if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                        currentFunctionName = ctx.currentToken;
                     }
-                    if(ctx.And({ParserState::name, ParserState::argument}) && ctx.IsClosed(ParserState::genericargumentlist)){
-                        std::cerr<<"data: "<<data.name<<std::endl;
-                        data.name = ctx.currentToken;
+                    if(ctx.And({ParserState::name, ParserState::call}) && ctx.Nand({ParserState::genericargumentlist, ParserState::argumentlist})){
+                        currentFunctionCall = ctx.currentToken;
+                    }
+                    if(ctx.IsOpen(ParserState::argument) && ctx.IsClosed(ParserState::genericargumentlist)){
+                        argumentexpr += ctx.currentToken;
                     }
                 };
             }
