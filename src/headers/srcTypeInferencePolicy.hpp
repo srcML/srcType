@@ -38,6 +38,7 @@ namespace srcTypeNS{
         public:
             std::list<srcTypeInferenceData> data;
             std::vector<DeclTypePolicy::DeclTypeData> currentParameters;
+            std::vector<std::string> operatorStack;
             std::string currentFunctionCall, currentFunctionName, argumentexpr;
             srcType * const dictionary;
             srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
@@ -87,9 +88,16 @@ namespace srcTypeNS{
                         }
                         std::cerr<<filteredFunctionList.size();
                     }
+                    if(operatorStack.size() == ctx.NumCurrentlyOpen(ParserState::call)){
+                        operatorStack.pop_back();
+                    }
                 };
                 closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::call)){}
+                    if(ctx.IsOpen(ParserState::call)){
+                        if(operatorStack.size() > ctx.NumCurrentlyOpen(ParserState::call)){
+                            operatorStack.push_back(ctx.currentToken);
+                        }
+                    }
                 };
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
