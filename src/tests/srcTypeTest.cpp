@@ -283,6 +283,16 @@ bool TestCollectCallData(){
         assert(false);
     }
 }
+bool TestCollectCallDataWithExpr(){
+    try{
+        std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
+        std::string srcmlStr = StringToSrcML(str);
+        srcTypeNS::srcType typeDict(srcmlStr, 0);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+        assert(false);
+    }
+}
 /*
 bool TestTypedefedType(){
     return true;

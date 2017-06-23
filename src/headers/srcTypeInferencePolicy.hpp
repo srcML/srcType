@@ -80,13 +80,16 @@ namespace srcTypeNS{
                         }
                     }
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
-                        const int ONLY_ONE_FUNCTION_IN_RESULT = 1;
-                        auto func = dictionary->FindFunction(currentFunctionCall, currentParameters);
-                        if(func.size() == ONLY_ONE_FUNCTION_IN_RESULT){
-                            data.push_back(srcTypeInferenceData(func.at(0).name, func.at(0).returnType));
+                        const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
+                        auto filteredFunctionList = dictionary->FindFunction(currentFunctionCall, currentParameters);
+                        for(auto function : filteredFunctionList){
+                            data.push_back(srcTypeInferenceData(function.name, function.returnType));
                         }
-                        std::cerr<<func.size();
+                        std::cerr<<filteredFunctionList.size();
                     }
+                };
+                closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                    if(ctx.IsOpen(ParserState::call)){}
                 };
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
