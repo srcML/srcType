@@ -178,7 +178,6 @@ bool TestNamespacedComplexType(){
         typeDict.SetContext("testsrcType.cpp", "Foo"); 
         {
             auto nameprofile = typeDict.FindVariable("coo");
-            std::cerr<<"Type1: "<< nameprofile.front().nameoftype<<std::endl;
             assert(nameprofile.front().nameoftype == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameoftype) == false
                    && nameprofile.front().namespaces.front() == "std");

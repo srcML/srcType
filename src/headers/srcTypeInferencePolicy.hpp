@@ -33,6 +33,9 @@ namespace srcTypeNS{
         std::string name;
         std::string type;
     };
+    struct CallFrame{
+        std::string callName;
+    };
     class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
         public:
@@ -93,7 +96,19 @@ namespace srcTypeNS{
                     }
                 };
                 closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                    /*Parsing calls have three cases. 
+                    1. call(name*)
+                    2. call(prefixCall()+)
+                    3. call(infixCall())
+                    The first case is the simplest and only requires a lookup of name. The second case requires prefixCall
+                    and any call within its arguments to be handled before call is handled. In this case, we should push a
+                    call frame onto the stack and begin a new frame to handle this call. Once the call is finished, pop the
+                    stack and take the return type and use it in the previous call frame. The third case is the nastiest.
+                    Infix calls are C++ operators and not very parse-friendly. For the time being, we will skip arguments
+                    that use infix and instead take a guess at what they are based on surrounding data.*/
+
                     if(ctx.IsOpen(ParserState::call)){
+                        //have not seen an operator at this call level yet, push so that we know to skip until we see </argument>
                         if(operatorStack.size() > ctx.NumCurrentlyOpen(ParserState::call)){
                             operatorStack.push_back(ctx.currentToken);
                         }
