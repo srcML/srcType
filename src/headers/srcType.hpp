@@ -47,36 +47,36 @@ namespace srcTypeNS{
                 return true;
             }
             //Assumes context was set
-            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varName) const{
+            std::vector<DeclData> FindVariable(std::string varName) const{
                 auto it = data.variableMap.find(currentfilename + currentfunctionname + varName);
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
                     throw std::runtime_error("Could not find variable with key: " + currentfilename+" "+currentfunctionname+" "+varName + "\n");
                 }
-                return std::vector<DeclTypePolicy::DeclTypeData>();
+                return std::vector<DeclData>();
             }
 
             //Does not use context
-            std::vector<DeclTypePolicy::DeclTypeData> FindVariable(std::string varName, std::string functionName, std::string fileName) const{
+            std::vector<DeclData> FindVariable(std::string varName, std::string functionName, std::string fileName) const{
                 auto it = data.variableMap.find(fileName + functionName + varName);
                 if(it != data.variableMap.end()){
                     return it->second;
                 }else{
                     throw std::runtime_error("Could not find variable with key: file: " + fileName+" func: "+functionName+" Id: "+varName + "\n");
                 }
-                return std::vector<DeclTypePolicy::DeclTypeData>();
+                return std::vector<DeclData>();
             }
 
             //Does not use context
-            std::vector<ParamTypePolicy::ParamData> FindParam(std::string varName, std::string functionName) const{
+            std::vector<DeclData> FindParam(std::string varName, std::string functionName) const{
                 auto it = data.paramMap.find(functionName + varName);
                 if(it != data.paramMap.end()){
                     return it->second;
                 }else{
                     throw std::runtime_error("Could not find parameter with key: " + functionName+" Name: "+varName + "\n");
                 }
-                return std::vector<ParamTypePolicy::ParamData>();
+                return std::vector<DeclData>();
             }
             
 
@@ -96,7 +96,7 @@ namespace srcTypeNS{
                 return std::vector<FunctionSignaturePolicy::SignatureData>();
             }
 
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<DeclTypePolicy::DeclTypeData>& callParams) {
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<DeclData>& callParams) {
                 std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);
                 std::string callparamtypes, currentparamtypes;

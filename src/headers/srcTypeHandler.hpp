@@ -28,8 +28,8 @@
 #include <FunctionSignaturePolicy.hpp>
 namespace srcTypeNS{
     struct srcTypeData{
-        std::unordered_map<std::string, std::vector<ParamTypePolicy::ParamData>> paramMap;
-        std::unordered_map<std::string, std::vector<DeclTypePolicy::DeclTypeData>> variableMap;
+        std::unordered_map<std::string, std::vector<DeclData>> paramMap;
+        std::unordered_map<std::string, std::vector<DeclData>> variableMap;
         std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
     };
     class srcTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
@@ -46,12 +46,12 @@ namespace srcTypeNS{
                 using namespace srcSAXEventDispatch;
                 if(ctx.IsOpen(ParserState::declstmt)){
                     //Grab data
-                    decldata = *policy->Data<DeclTypePolicy::DeclTypeData>();
+                    decldata = *policy->Data<DeclData>();
 
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier);
                     if(declCheck == srctypedata.variableMap.end()){
-                        std::vector<DeclTypePolicy::DeclTypeData> decldatavec = {decldata};
+                        std::vector<DeclData> decldatavec = {decldata};
                         srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier, decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
@@ -65,7 +65,7 @@ namespace srcTypeNS{
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                         auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameofidentifier);
                         if(paramCheck == srctypedata.paramMap.end()){
-                            std::vector<ParamTypePolicy::ParamData> paramdatavec = {param};
+                            std::vector<DeclData> paramdatavec = {param};
                             srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameofidentifier, paramdatavec));
                         }else{
                             paramCheck->second.push_back(param);
@@ -101,7 +101,7 @@ namespace srcTypeNS{
             srcTypeData srctypedata;
 
             DeclTypePolicy declpolicy;
-            DeclTypePolicy::DeclTypeData decldata;
+            DeclData decldata;
 
             FunctionSignaturePolicy functionpolicy;
             FunctionSignaturePolicy::SignatureData functionsigdata;

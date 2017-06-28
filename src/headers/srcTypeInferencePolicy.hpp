@@ -40,7 +40,7 @@ namespace srcTypeNS{
     {
         public:
             std::list<srcTypeInferenceData> data;
-            std::vector<DeclTypePolicy::DeclTypeData> currentParameters;
+            std::vector<DeclData> currentParameters;
             std::vector<std::string> operatorStack;
             std::string currentFunctionCall, currentFunctionName, argumentexpr;
             srcType * const dictionary;
