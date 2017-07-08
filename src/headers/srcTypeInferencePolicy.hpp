@@ -33,12 +33,14 @@ namespace srcTypeNS{
         std::string name;
         std::string type;
     };
-    struct CallFrame{
+    struct CallStackFrame{
         std::string callName;
+        std::list<std::string> parameters;
     };
     class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
         public:
+            std::list<CallStackFrame> callStack;
             std::list<srcTypeInferenceData> data;
             std::vector<DeclData> currentParameters;
             std::vector<std::string> operatorStack;
@@ -64,17 +66,25 @@ namespace srcTypeNS{
         private:
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
+                openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
+                    argumentexpr.clear();
+                };
+                /*End of argument. If no infix operator or parent function call (i.e., foo(bar())) was seen, then just look up
+                the name.  If parent function call was seen */
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                         try{
                             auto var = dictionary->FindVariable(argumentexpr, currentFunctionName, "testsrcType.cpp");
                             currentParameters.push_back(var.at(0));
-    
+                            callStack.back().parameters.push_back(var.at(0).nameoftype);
                         }catch(std::runtime_error e){
                             std::cerr<<e.what();
                         }
                         argumentexpr.clear();
                     }
+                };
+                openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
+                    callStack.push_back(CallStackFrame());
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
@@ -89,6 +99,11 @@ namespace srcTypeNS{
                         for(auto function : filteredFunctionList){
                             data.push_back(srcTypeInferenceData(function.name, function.returnType));
                         }
+                        //FIX: Todo, pop call stack and record the return type of the last call in the current position
+                        //of parameter list
+                        callStack.pop_back();
+                        callStack.back().parameters.push_back()
+                        
                         std::cerr<<filteredFunctionList.size();
                     }
                     if(operatorStack.size() == ctx.NumCurrentlyOpen(ParserState::call)){
@@ -118,6 +133,7 @@ namespace srcTypeNS{
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
                     if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
                         currentFunctionName = ctx.currentToken;
+                        callStack.back().callName = currentFunctionName;
                     }
                     if(ctx.And({ParserState::name, ParserState::call}) && ctx.Nand({ParserState::genericargumentlist, ParserState::argumentlist})){
                         currentFunctionCall = ctx.currentToken;
