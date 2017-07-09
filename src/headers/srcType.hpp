@@ -47,6 +47,19 @@ namespace srcTypeNS{
                 return true;
             }
             //Assumes context was set
+            std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string fileName) const{
+                auto varit = data.variableMap.find(fileName + functionName + varName);
+                auto paramit = data.paramMap.find(functionName + varName);
+                if(varit != data.variableMap.end()){
+                    return varit->second;
+                }else if (paramit != data.paramMap.end()){
+                    return paramit->second;
+                }else{
+                    throw std::runtime_error("Could not find identifier with key: " + currentfilename+" "+functionName+" "+varName + "\n");
+                }
+                return std::vector<DeclData>();
+            }
+            //Assumes context was set
             std::vector<DeclData> FindVariable(std::string varName) const{
                 auto it = data.variableMap.find(currentfilename + currentfunctionname + varName);
                 if(it != data.variableMap.end()){
@@ -95,7 +108,30 @@ namespace srcTypeNS{
                 }
                 return std::vector<FunctionSignaturePolicy::SignatureData>();
             }
-
+            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
+                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
+                auto it = data.functionMap.find(funcName);
+                std::string callparamtypes, currentparamtypes;
+                if(it != data.functionMap.end()){
+                    for(auto func : it->second){
+                        if(func.parameters.size() == callParams.size()){
+                            for(unsigned int i = 0; i< func.parameters.size(); ++i){
+                                callparamtypes += callParams.at(i);
+                                currentparamtypes+=func.parameters.at(i).nameoftype;
+                            }
+                            if(callparamtypes == currentparamtypes){
+                                resultVec.push_back(func);
+                            }
+                            callparamtypes.clear();
+                            currentparamtypes.clear();
+                        }
+                    }
+                    return resultVec;
+                }else{
+                    throw std::runtime_error("Could not find function with key: " + funcName + "\n");
+                }
+                return std::vector<FunctionSignaturePolicy::SignatureData>();
+            }
             std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<DeclData>& callParams) {
                 std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);

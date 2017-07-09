@@ -282,6 +282,17 @@ bool TestCollectCallData(){
         assert(false);
     }
 }
+bool TestCollectNestedCallData(){
+    std::cerr<<"TEST NESTED CALL"<<std::endl;
+    try{
+        std::string str = "double Boo(double b, int c){} std::string Foo(int a){Foo(Boo(a,1));}";
+        std::string srcmlStr = StringToSrcML(str);
+        srcTypeNS::srcType typeDict(srcmlStr, 0);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+        assert(false);
+    }
+}
 bool TestCollectCallDataWithExpr(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
@@ -320,6 +331,7 @@ int main(int argc, char** argv){
     TestFindMultiArgFunction();
     TestFindMutliNoArgFunction();
     TestCollectCallData();
+    TestCollectNestedCallData();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);

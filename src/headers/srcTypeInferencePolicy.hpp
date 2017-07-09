@@ -34,8 +34,11 @@ namespace srcTypeNS{
         std::string type;
     };
     struct CallStackFrame{
+        CallStackFrame(std::string name){
+            callName = name;
+        }
         std::string callName;
-        std::list<std::string> parameters;
+        std::vector<std::string> parameters;
     };
     class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
@@ -66,15 +69,21 @@ namespace srcTypeNS{
         private:
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
+                
+                closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx){
+                    argumentexpr.clear();
+                };
+
                 openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     argumentexpr.clear();
                 };
                 /*End of argument. If no infix operator or parent function call (i.e., foo(bar())) was seen, then just look up
                 the name.  If parent function call was seen */
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
-                    if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                    if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist) && !argumentexpr.empty()){
                         try{
-                            auto var = dictionary->FindVariable(argumentexpr, currentFunctionName, "testsrcType.cpp");
+                            std::cerr<<"Lookup id: "<<argumentexpr<<std::endl;
+                            auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "testsrcType.cpp");
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameoftype);
                         }catch(std::runtime_error e){
@@ -83,32 +92,32 @@ namespace srcTypeNS{
                         argumentexpr.clear();
                     }
                 };
+
                 openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    callStack.push_back(CallStackFrame());
+                    std::cerr<<"PUSHING"<<std::endl;
+                    
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    if(ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
-                        std::string hash;
-                        for(auto param : currentParameters){
-                            hash += param.nameoftype;
-                        }
-                    }
+                    std::cerr<<"END CALL"<<std::endl;
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
                         const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
-                        auto filteredFunctionList = dictionary->FindFunction(currentFunctionCall, currentParameters);
+                        const unsigned int NESTED_CALL_RESOLVED = 1;
+                        std::cerr<<"Lookup: "<<callStack.size()<<callStack.back().callName<<std::endl;
+                        auto filteredFunctionList = dictionary->FindFunction(callStack.back().callName, callStack.back().parameters);
                         for(auto function : filteredFunctionList){
                             data.push_back(srcTypeInferenceData(function.name, function.returnType));
                         }
-                        //FIX: Todo, pop call stack and record the return type of the last call in the current position
-                        //of parameter list
-                        callStack.pop_back();
-                        callStack.back().parameters.push_back()
+                        if(data.size() == ONLY_ONE_FUNCTION_IN_RESULT && callStack.size() > NESTED_CALL_RESOLVED){
+                            //FIX: Todo, pop call stack and record the return type of the last call in the current position
+                            //of parameter list
+                            std::cerr<<"POPPING: "<<data.back().type<<std::endl;
+                            callStack.pop_back();
+                            callStack.back().parameters.push_back(data.back().type);
+                        }
                         
                         std::cerr<<filteredFunctionList.size();
                     }
-                    if(operatorStack.size() == ctx.NumCurrentlyOpen(ParserState::call)){
-                        operatorStack.pop_back();
-                    }
+
                 };
                 closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                     /*Parsing calls have three cases. 
@@ -122,21 +131,19 @@ namespace srcTypeNS{
                     Infix calls are C++ operators and not very parse-friendly. For the time being, we will skip arguments
                     that use infix and instead take a guess at what they are based on surrounding data.*/
 
-                    if(ctx.IsOpen(ParserState::call)){
-                        //have not seen an operator at this call level yet, push so that we know to skip until we see </argument>
-                        if(operatorStack.size() > ctx.NumCurrentlyOpen(ParserState::call)){
-                            operatorStack.push_back(ctx.currentToken);
-                        }
-                    }
                 };
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
                     if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                        std::cerr<<ctx.currentToken<<std::endl;
                         currentFunctionName = ctx.currentToken;
-                        callStack.back().callName = currentFunctionName;
                     }
-                    if(ctx.And({ParserState::name, ParserState::call}) && ctx.Nand({ParserState::genericargumentlist, ParserState::argumentlist})){
-                        currentFunctionCall = ctx.currentToken;
+                    if(ctx.And({ParserState::name, ParserState::call}) && ctx.IsClosed(ParserState::genericargumentlist)){
+                        if(ctx.IsGreaterThan(ParserState::call, ParserState::argumentlist)){
+                            std::cerr<<"Assign: "<<ctx.currentToken<<std::endl;
+                            currentFunctionCall = ctx.currentToken;
+                            callStack.push_back(CallStackFrame(ctx.currentToken));
+                        }
                     }
                     if(ctx.IsOpen(ParserState::argument) && ctx.IsClosed(ParserState::genericargumentlist)){
                         argumentexpr += ctx.currentToken;
