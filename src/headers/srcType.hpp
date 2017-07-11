@@ -111,14 +111,18 @@ namespace srcTypeNS{
             std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
                 std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);
+                std::cerr<<"FOUND ONE??: "<<it->second.size()<<std::endl;
                 std::string callparamtypes, currentparamtypes;
                 if(it != data.functionMap.end()){
+                    //if(it->second.size() == 1){return it->second;}
                     for(auto func : it->second){
+                        std::cerr<<func.parameters.size()<<" "<<callParams.size()<<std::endl;
                         if(func.parameters.size() == callParams.size()){
                             for(unsigned int i = 0; i< func.parameters.size(); ++i){
                                 callparamtypes += callParams.at(i);
                                 currentparamtypes+=func.parameters.at(i).nameoftype;
                             }
+                            std::cerr<<"COMPARE: 1. "<<callparamtypes<<" 2."<<currentparamtypes<<std::endl;
                             if(callparamtypes == currentparamtypes){
                                 resultVec.push_back(func);
                             }

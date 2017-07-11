@@ -285,7 +285,7 @@ bool TestCollectCallData(){
 bool TestCollectNestedCallData(){
     std::cerr<<"TEST NESTED CALL"<<std::endl;
     try{
-        std::string str = "double Boo(double b, int c){} std::string Foo(int a){Foo(Boo(a,1));}";
+        std::string str = "double Boo(int b){} double Foo(double x, double y){int a; Foo(y, Foo(x, y));}";
         std::string srcmlStr = StringToSrcML(str);
         srcTypeNS::srcType typeDict(srcmlStr, 0);
     }catch(std::runtime_error e){

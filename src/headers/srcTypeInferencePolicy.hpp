@@ -47,7 +47,7 @@ namespace srcTypeNS{
             std::list<srcTypeInferenceData> data;
             std::vector<DeclData> currentParameters;
             std::vector<std::string> operatorStack;
-            std::string currentFunctionCall, currentFunctionName, argumentexpr;
+            std::string currentFunctionName, argumentexpr;
             srcType * const dictionary;
             srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
             {
@@ -93,28 +93,21 @@ namespace srcTypeNS{
                     }
                 };
 
-                openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"PUSHING"<<std::endl;
-                    
-                };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<"END CALL"<<std::endl;
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
                         const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
                         const unsigned int NESTED_CALL_RESOLVED = 1;
-                        std::cerr<<"Lookup: "<<callStack.size()<<callStack.back().callName<<std::endl;
+
                         auto filteredFunctionList = dictionary->FindFunction(callStack.back().callName, callStack.back().parameters);
                         for(auto function : filteredFunctionList){
                             data.push_back(srcTypeInferenceData(function.name, function.returnType));
                         }
-                        if(data.size() == ONLY_ONE_FUNCTION_IN_RESULT && callStack.size() > NESTED_CALL_RESOLVED){
-                            //FIX: Todo, pop call stack and record the return type of the last call in the current position
-                            //of parameter list
+
+                        if(ctx.NumCurrentlyOpen(ParserState::call) > 1){ //Have to be in some nested call
                             std::cerr<<"POPPING: "<<data.back().type<<std::endl;
-                            callStack.pop_back();
-                            callStack.back().parameters.push_back(data.back().type);
+                            callStack.pop_back(); //pop current, resolved call
+                            callStack.back().parameters.push_back(data.back().type); //Add resolved call's return type to param list
                         }
-                        
                         std::cerr<<filteredFunctionList.size();
                     }
 
@@ -135,13 +128,10 @@ namespace srcTypeNS{
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
                     if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                        std::cerr<<ctx.currentToken<<std::endl;
                         currentFunctionName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::call}) && ctx.IsClosed(ParserState::genericargumentlist)){
                         if(ctx.IsGreaterThan(ParserState::call, ParserState::argumentlist)){
-                            std::cerr<<"Assign: "<<ctx.currentToken<<std::endl;
-                            currentFunctionCall = ctx.currentToken;
                             callStack.push_back(CallStackFrame(ctx.currentToken));
                         }
                     }
