@@ -108,57 +108,42 @@ namespace srcTypeNS{
                 }
                 return std::vector<FunctionSignaturePolicy::SignatureData>();
             }
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
-                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
+            typedef std::pair<double, FunctionSignaturePolicy::SignatureData> FunctionProbabilityPair;
+            std::vector<FunctionProbabilityPair> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
+                std::vector<FunctionProbabilityPair> resultVec;
                 auto it = data.functionMap.find(funcName);
                 std::cerr<<"FOUND ONE??: "<<it->second.size()<<std::endl;
-                std::string callparamtypes, currentparamtypes;
                 if(it != data.functionMap.end()){
                     //if(it->second.size() == 1){return it->second;}
                     for(auto func : it->second){
+                        double  probability = 0, numParameters = 0, numTrue = 0;
                         std::cerr<<func.parameters.size()<<" "<<callParams.size()<<std::endl;
                         if(func.parameters.size() == callParams.size()){
                             for(unsigned int i = 0; i< func.parameters.size(); ++i){
-                                callparamtypes += callParams.at(i);
-                                currentparamtypes+=func.parameters.at(i).nameoftype;
+                                if(callParams.at(i) == func.parameters.at(i).nameoftype){
+                                    ++numParameters;
+                                    ++numTrue;
+                                    probability = numTrue/numParameters;
+                                }else{
+                                    ++numParameters;
+                                    probability = numTrue/numParameters;
+                                }
                             }
-                            std::cerr<<"COMPARE: 1. "<<callparamtypes<<" 2."<<currentparamtypes<<std::endl;
-                            if(callparamtypes == currentparamtypes){
-                                resultVec.push_back(func);
-                            }
-                            callparamtypes.clear();
-                            currentparamtypes.clear();
+                            resultVec.push_back(std::make_pair(probability, func));
                         }
+                    }
+                    std::sort(resultVec.begin(), resultVec.end(),
+                        [](FunctionProbabilityPair a, FunctionProbabilityPair b){
+                            return a.first < b.first;
+                        });
+                    for(auto pair : resultVec){
+                        std::cerr<<"Func name: "<<pair.second.name<<" probability: "<<pair.first<<std::endl;
                     }
                     return resultVec;
                 }else{
                     throw std::runtime_error("Could not find function with key: " + funcName + "\n");
                 }
-                return std::vector<FunctionSignaturePolicy::SignatureData>();
-            }
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, const std::vector<DeclData>& callParams) {
-                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
-                auto it = data.functionMap.find(funcName);
-                std::string callparamtypes, currentparamtypes;
-                if(it != data.functionMap.end()){
-                    for(auto func : it->second){
-                        if(func.parameters.size() == callParams.size()){
-                            for(unsigned int i = 0; i< func.parameters.size(); ++i){
-                                callparamtypes += callParams.at(i).nameoftype;
-                                currentparamtypes+=func.parameters.at(i).nameoftype;
-                            }
-                            if(callparamtypes == currentparamtypes){
-                                resultVec.push_back(func);
-                            }
-                            callparamtypes.clear();
-                            currentparamtypes.clear();
-                        }
-                    }
-                    return resultVec;
-                }else{
-                    throw std::runtime_error("Could not find function with key: " + funcName + "\n");
-                }
-                return std::vector<FunctionSignaturePolicy::SignatureData>();
+                return std::vector<FunctionProbabilityPair>();
             }
     };
 }

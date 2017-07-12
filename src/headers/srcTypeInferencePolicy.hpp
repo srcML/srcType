@@ -92,7 +92,9 @@ namespace srcTypeNS{
                         argumentexpr.clear();
                     }
                 };
-
+                openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx){
+                    std::cerr<<ctx.currentAttributeName << " = "<<ctx.currentAttributeValue<<std::endl;
+                };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
                         const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
@@ -100,7 +102,7 @@ namespace srcTypeNS{
 
                         auto filteredFunctionList = dictionary->FindFunction(callStack.back().callName, callStack.back().parameters);
                         for(auto function : filteredFunctionList){
-                            data.push_back(srcTypeInferenceData(function.name, function.returnType));
+                            data.push_back(srcTypeInferenceData(function.second.name, function.second.returnType));
                         }
 
                         if(ctx.NumCurrentlyOpen(ParserState::call) > 1){ //Have to be in some nested call
@@ -111,6 +113,10 @@ namespace srcTypeNS{
                         std::cerr<<filteredFunctionList.size();
                     }
 
+                    //write the return type into srcML archive at the call site
+                    xmlTextWriterStartElementNS(ctx.writer, (const xmlChar*)"src",(const xmlChar*)"rtype", (const xmlChar*)"http://www.srcML.org/srcML/src");
+                    ctx.write_content(data.back().type);
+                    xmlTextWriterEndElement(ctx.writer);
                 };
                 closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                     /*Parsing calls have three cases. 

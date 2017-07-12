@@ -293,6 +293,17 @@ bool TestCollectNestedCallData(){
         assert(false);
     }
 }
+bool TestProbabilityFilter(){
+    std::cerr<<"TEST FILTER"<<std::endl;
+    try{
+        std::string str = "double Boo(int b, double e){} double Boo(double b, double c){} double Foo(double x, double y){int a; Foo(y, Foo(x, Boo(y, x)));}";
+        std::string srcmlStr = StringToSrcML(str);
+        srcTypeNS::srcType typeDict(srcmlStr, 0);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+        assert(false);
+    }
+}
 bool TestCollectCallDataWithExpr(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
@@ -332,6 +343,7 @@ int main(int argc, char** argv){
     TestFindMutliNoArgFunction();
     TestCollectCallData();
     TestCollectNestedCallData();
+    TestProbabilityFilter();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);
