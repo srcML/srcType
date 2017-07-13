@@ -125,6 +125,15 @@ namespace srcTypeNS{
                                     ++numTrue;
                                     probability = numTrue/numParameters;
                                 }else{
+                                    if(callParams.at(i) == "string"){
+                                        if(stringConversionTypes.find(func.parameters.at(i).nameoftype) != stringConversionTypes.end()){
+                                            ++numTrue;
+                                        }
+                                    }else if (callParams.at(i) == "number"){
+                                        if(numberConversionTypes.find(func.parameters.at(i).nameoftype) != numberConversionTypes.end()){
+                                            ++numTrue;
+                                        }
+                                    }
                                     ++numParameters;
                                     probability = numTrue/numParameters;
                                 }

@@ -24,6 +24,7 @@
 #include <iostream>
 #include <exception>
 #include <unordered_map>
+#include <unordered_set>
 namespace srcTypeNS{    
     enum PrimTypes{INT, UINT, SIINT, SHINT, SISINT, USISINT, LINT, SLINT, USILINT, SILINT, LDOUBLE, WCHAR, CHAR, UCHAR, SCHAR, VOID, FLOAT, BOOL, DOUBLE, SIZE_T};
     enum VarCategory {primitive=0, userdefined=1};
@@ -51,4 +52,31 @@ namespace srcTypeNS{
     {"double", DOUBLE},
     {"size_t", SIZE_T}};
 };
+    static const std::unordered_set<std::string> numberConversionTypes{
+    "int",
+    "unsigned int",
+    "signed int",
+    "short int",
+    "signed short int",
+    "unsigned short int",
+    "long int",
+    "signed long int",
+    "unsigned long int",
+    "float",
+    "double",
+    "long double",
+    "wchar_t",
+    "char",
+    "unsigned char",
+    "signed char",
+    "void",
+    "float",
+    "bool",
+    "double",
+    "size_t"};
+
+    static const std::unordered_set<std::string> stringConversionTypes{
+    "char",
+    "unsigned char",
+    "signed char"};
 #endif

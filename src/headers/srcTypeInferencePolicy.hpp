@@ -47,7 +47,7 @@ namespace srcTypeNS{
             std::list<srcTypeInferenceData> data;
             std::vector<DeclData> currentParameters;
             std::vector<std::string> operatorStack;
-            std::string currentFunctionName, argumentexpr;
+            std::string currentFunctionName, argumentexpr, currentAttr, currentAttrType;
             srcType * const dictionary;
             srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
             {
@@ -88,12 +88,20 @@ namespace srcTypeNS{
                             callStack.back().parameters.push_back(var.at(0).nameoftype);
                         }catch(std::runtime_error e){
                             std::cerr<<e.what();
+                            if(currentAttrType == "type"){
+                                std::cerr<<"Oh, it's a "<<currentAttr<<". Repairing and marking as a "<<currentAttr<<"."<<std::endl;
+                                callStack.back().parameters.push_back(currentAttr);
+                            }
                         }
                         argumentexpr.clear();
                     }
                 };
-                openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx){
-                    std::cerr<<ctx.currentAttributeName << " = "<<ctx.currentAttributeValue<<std::endl;
+                closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx){
+                    if(ctx.currentAttributeName == "type"){
+                        std::cerr<<"ATTRIBUTE: "<<ctx.currentAttributeName << " = "<<ctx.currentAttributeValue<<std::endl;
+                        currentAttr = ctx.currentAttributeValue;
+                        currentAttrType = ctx.currentAttributeName;
+                    }
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsClosed(ParserState::genericargumentlist)){

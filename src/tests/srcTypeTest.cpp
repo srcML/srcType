@@ -304,6 +304,17 @@ bool TestProbabilityFilter(){
         assert(false);
     }
 }
+bool TestComputeLiteral(){
+    std::cerr<<"TEST LITERAL"<<std::endl;
+    try{
+        std::string str = "double Boo(int b, double e){} double Foo(double x, double y){int a; Foo(y, Foo(5, Boo(y, \"x\")));}";
+        std::string srcmlStr = StringToSrcML(str);
+        srcTypeNS::srcType typeDict(srcmlStr, 0);
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+        assert(false);
+    }
+}
 bool TestCollectCallDataWithExpr(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
@@ -344,6 +355,7 @@ int main(int argc, char** argv){
     TestCollectCallData();
     TestCollectNestedCallData();
     TestProbabilityFilter();
+    TestComputeLiteral();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);
