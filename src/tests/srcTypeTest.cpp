@@ -307,7 +307,7 @@ bool TestProbabilityFilter(){
 bool TestComputeLiteral(){
     std::cerr<<"TEST LITERAL"<<std::endl;
     try{
-        std::string str = "double Boo(int b, double e){} double Foo(double x, double y){int a; Foo(y, Foo(5, Boo(y, \"x\")));}";
+        std::string str = "double Boo(int b, std::string e){} double Foo(double x, double y){int a; Foo(y, Foo(5, Boo(y, \"x\")));}";
         std::string srcmlStr = StringToSrcML(str);
         srcTypeNS::srcType typeDict(srcmlStr, 0);
     }catch(std::runtime_error e){

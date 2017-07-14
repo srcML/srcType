@@ -125,13 +125,14 @@ namespace srcTypeNS{
                                     ++numTrue;
                                     probability = numTrue/numParameters;
                                 }else{
-                                    if(callParams.at(i) == "string"){
+                                    std::cerr<<"TEST: "<<callParams.at(i)<<" "<<func.parameters.at(i).nameoftype<<std::endl;
+                                    if(stringConversionTypes.find(callParams.at(i)) != stringConversionTypes.end()){ //Current param is a string literal type
                                         if(stringConversionTypes.find(func.parameters.at(i).nameoftype) != stringConversionTypes.end()){
-                                            ++numTrue;
+                                            ++numTrue; //Ok, the argument in the original definition is convertable to string, so these might match
                                         }
-                                    }else if (callParams.at(i) == "number"){
+                                    }else if (numberConversionTypes.find(callParams.at(i)) != numberConversionTypes.end()){ //Current param is a number literal type
                                         if(numberConversionTypes.find(func.parameters.at(i).nameoftype) != numberConversionTypes.end()){
-                                            ++numTrue;
+                                            ++numTrue; //Ok, the argument in the original definition is convertable to some builtin number type, so these might match
                                         }
                                     }
                                     ++numParameters;
