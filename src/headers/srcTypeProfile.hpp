@@ -54,6 +54,7 @@ namespace srcTypeNS{
 };
     static const std::unordered_set<std::string> numberConversionTypes{
     "int",
+    "number",
     "unsigned int",
     "signed int",
     "short int",
@@ -78,5 +79,6 @@ namespace srcTypeNS{
     static const std::unordered_set<std::string> stringConversionTypes{
     "char",
     "unsigned char",
-    "signed char"};
+    "signed char",
+    "string"};
 #endif
