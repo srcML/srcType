@@ -91,6 +91,8 @@ namespace srcTypeNS{
                             if(currentAttrType == "type"){
                                 std::cerr<<"Oh, it's a "<<currentAttr<<". Repairing and marking as a "<<currentAttr<<"."<<std::endl;
                                 callStack.back().parameters.push_back(currentAttr);
+                            }else{
+                                callStack.back().parameters.push_back("unresolved");
                             }
                         }
                         argumentexpr.clear();
