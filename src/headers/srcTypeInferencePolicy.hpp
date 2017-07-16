@@ -40,8 +40,7 @@ namespace srcTypeNS{
         std::string callName;
         std::vector<std::string> parameters;
     };
-    class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
-    {
+    class srcTypeInferencePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
         public:
             std::list<CallStackFrame> callStack;
             std::list<srcTypeInferenceData> data;
@@ -49,12 +48,9 @@ namespace srcTypeNS{
             std::vector<std::string> operatorStack;
             std::string currentFunctionName, argumentexpr, currentAttr, currentAttrType;
             srcType * const dictionary;
-            srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data)
-            {
+            srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data){
                 
                 InitializeEventHandlers();
-                //declpolicy.AddListener(this);
-                //functionpolicy.AddListener(this);
             }
     
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
@@ -82,7 +78,6 @@ namespace srcTypeNS{
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist) && !argumentexpr.empty()){
                         try{
-                            std::cerr<<"Lookup id: "<<argumentexpr<<std::endl;
                             auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "testsrcType.cpp");
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameoftype);
@@ -100,7 +95,6 @@ namespace srcTypeNS{
                 };
                 closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx){
                     if(ctx.currentAttributeName == "type"){
-                        std::cerr<<"ATTRIBUTE: "<<ctx.currentAttributeName << " = "<<ctx.currentAttributeValue<<std::endl;
                         currentAttr = ctx.currentAttributeValue;
                         currentAttrType = ctx.currentAttributeName;
                     }
@@ -116,11 +110,9 @@ namespace srcTypeNS{
                         }
 
                         if(ctx.NumCurrentlyOpen(ParserState::call) > 1){ //Have to be in some nested call
-                            std::cerr<<"POPPING: "<<data.back().type<<std::endl;
                             callStack.pop_back(); //pop current, resolved call
                             callStack.back().parameters.push_back(data.back().type); //Add resolved call's return type to param list
                         }
-                        std::cerr<<filteredFunctionList.size();
                     }
 
                     //write the return type into srcML archive at the call site
@@ -128,21 +120,18 @@ namespace srcTypeNS{
                     ctx.write_content(data.back().type);
                     xmlTextWriterEndElement(ctx.writer);
                 };
-                closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
-                    /*Parsing calls have three cases. 
-                    1. call(name*)
-                    2. call(prefixCall()+)
-                    3. call(infixCall())
-                    The first case is the simplest and only requires a lookup of name. The second case requires prefixCall
-                    and any call within its arguments to be handled before call is handled. In this case, we should push a
-                    call frame onto the stack and begin a new frame to handle this call. Once the call is finished, pop the
-                    stack and take the return type and use it in the previous call frame. The third case is the nastiest.
-                    Infix calls are C++ operators and not very parse-friendly. For the time being, we will skip arguments
-                    that use infix and instead take a guess at what they are based on surrounding data.*/
-
-                };
+                /*Parsing calls have three cases. 
+                  1. call(name*)
+                  2. call(prefixCall()+)
+                  3. call(infixCall())
+                  The first case is the simplest and only requires a lookup of name. The second case requires prefixCall
+                  and any call within its arguments to be handled before call is handled. In this case, we should push a
+                  call frame onto the stack and begin a new frame to handle this call. Once the call is finished, pop the
+                  stack and take the return type and use it in the previous call frame. The third case is the nastiest.
+                  Infix calls are C++ operators and not very parse-friendly. For the time being, we will skip arguments
+                  that use infix and instead take a guess at what they are based on surrounding data.
+                */
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
-                    //std::cerr<<ctx.And({ParserState::name, ParserState::call})<<std::endl;
                     if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
                         currentFunctionName = ctx.currentToken;
                     }

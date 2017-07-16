@@ -112,15 +112,12 @@ namespace srcTypeNS{
             std::vector<FunctionProbabilityPair> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
                 std::vector<FunctionProbabilityPair> resultVec;
                 auto it = data.functionMap.find(funcName);
-                std::cerr<<"FOUND ONE??: "<<it->second.size()<<std::endl;
                 if(it != data.functionMap.end()){
                     //if(it->second.size() == 1){return it->second;}
                     for(auto func : it->second){
                         double  probability = 0, numParameters = 0, numTrue = 0;
-                        std::cerr<<func.parameters.size()<<" "<<callParams.size()<<std::endl;
                         if(func.parameters.size() == callParams.size()){
                             for(unsigned int i = 0; i< func.parameters.size(); ++i){
-                                std::cerr<<"TEST: "<<callParams.at(i)<<" "<<func.parameters.at(i).nameoftype<<std::endl;
                                 if(callParams.at(i) == func.parameters.at(i).nameoftype){
                                     ++numTrue;
                                 }else if(stringConversionTypes.find(callParams.at(i)) != stringConversionTypes.end()){ //Current param is a string literal type
