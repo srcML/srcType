@@ -38,8 +38,8 @@ namespace srcTypeNS{
         //delete srcTypepol; 
         srcSAXController infcontrol(buffer);
         srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy(this);
-        srcSAXEventDispatch::srcSAXEventDispatcher<> Inferencehandler({srcTypeInferencePol}, true);
-        infcontrol.parse(&Inferencehandler);
+        srcSAXEventDispatch::srcSAXEventDispatcher<> inferenceHandler({srcTypeInferencePol}, true);
+        infcontrol.parse(&inferenceHandler);
     }
     srcType::srcType(FILE* file, const char* encoding = 0){
         //srcSAXController control(file);

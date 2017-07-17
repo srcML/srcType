@@ -48,8 +48,9 @@ namespace srcTypeNS{
             std::vector<std::string> operatorStack;
             std::string currentFunctionName, argumentexpr, currentAttr, currentAttrType;
             srcType * const dictionary;
-            srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data){
-                
+            xmlBufferPtr archiveBuffer;
+
+            srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data), archiveBuffer(nullptr){
                 InitializeEventHandlers();
             }
     
@@ -65,7 +66,9 @@ namespace srcTypeNS{
         private:
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
-                
+                closeEventMap[ParserState::archive] = [this](srcSAXEventContext& ctx){
+                    archiveBuffer = ctx.archiveBuffer;
+                };
                 closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx){
                     argumentexpr.clear();
                 };
