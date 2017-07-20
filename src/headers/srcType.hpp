@@ -33,10 +33,10 @@ namespace srcTypeNS{
             std::string currentfunctionname;
             srcTypeData data;
             srcType();
-            srcType(const char*, const char*);
-            srcType(std::string, const char*);
-            srcType(FILE*, const char*);
-            srcType(int, const char*);
+            srcType(const char*, const bool);
+            srcType(std::string, const bool);
+            srcType(FILE*, const bool);
+            srcType(int, const bool);
             void ReadArchiveFile(std::string);
             bool IsPrimitive(std::string type){
                 return cppPrimTypes.find(type) != cppPrimTypes.end();

@@ -22,31 +22,33 @@
 #include <srcTypeInferencePolicy.hpp>
 namespace srcTypeNS{
     srcType::srcType(){} 
-    srcType::srcType(const char* filename, const char* encoding = 0){
+    srcType::srcType(const char* filename, const bool inferTypes = false){
         srcTypePolicy* policy = new srcTypePolicy();
         srcSAXController control(filename);
         srcSAXEventDispatch::srcSAXEventDispatcher<> handler {policy};
         control.parse(&handler); //Start parsing
         data = policy->GetDictionary();
     }
-    srcType::srcType(std::string buffer, const char* encoding = 0){
+    srcType::srcType(std::string buffer, const bool inferTypes = false){
         srcTypePolicy* srcTypepol = new srcTypePolicy();
         srcSAXController control(buffer);
         srcSAXEventDispatch::srcSAXEventDispatcher<> srcTypehandler {srcTypepol};
         control.parse(&srcTypehandler); //Start parsing
         data = srcTypepol->GetDictionary();
         //delete srcTypepol; 
-        srcSAXController infcontrol(buffer);
-        srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy(this);
-        srcSAXEventDispatch::srcSAXEventDispatcher<> inferenceHandler({srcTypeInferencePol}, true);
-        infcontrol.parse(&inferenceHandler);
+        if(inferTypes){
+            srcSAXController infcontrol(buffer);
+            srcTypeInferencePolicy* srcTypeInferencePol = new srcTypeInferencePolicy(this);
+            srcSAXEventDispatch::srcSAXEventDispatcher<> inferenceHandler({srcTypeInferencePol}, true);
+            infcontrol.parse(&inferenceHandler);
+        }
     }
-    srcType::srcType(FILE* file, const char* encoding = 0){
+    srcType::srcType(FILE* file, const bool inferTypes = false){
         //srcSAXController control(file);
         //srcTypeHandler handler(&dictionary);
         //control.parse(&handler);
     }
-    srcType::srcType(int fd, const char* encoding = 0){
+    srcType::srcType(int fd, const bool inferTypes = false){
         //srcSAXController control(fd);
         //srcTypeHandler handler(&dictionary);
         //control.parse(&handler);

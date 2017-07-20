@@ -47,7 +47,6 @@ namespace srcTypeNS{
                 if(ctx.IsOpen(ParserState::declstmt)){
                     //Grab data
                     decldata = *policy->Data<DeclData>();
-
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier);
                     if(declCheck == srctypedata.variableMap.end()){

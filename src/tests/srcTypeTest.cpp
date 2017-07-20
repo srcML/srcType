@@ -63,7 +63,7 @@ std::string StringToSrcML(std::string str){
 bool TestPrimitiveTypes(){
     std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5; char array[30];}";
     std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
     try{
         typeDict.SetContext("testsrcType.cpp", "main");
         {
@@ -105,7 +105,7 @@ bool TestComplexType(){
     std::string str = "int main(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     try{
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, false);
         typeDict.SetContext("testsrcType.cpp", "main");    
         {
             auto nameprofile = typeDict.FindVariable("coo");
@@ -139,7 +139,7 @@ bool TestPrimitiveTypesMultiDecl(){
     std::string srcmlStr = StringToSrcML(str);
     
     try{
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, false);
         typeDict.SetContext("testsrcType.cpp", "main"); 
         {
             auto nameprofile = typeDict.FindVariable("c");
@@ -174,7 +174,7 @@ bool TestNamespacedComplexType(){
     std::string srcmlStr = StringToSrcML(str);
     
     try{
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, false);
         typeDict.SetContext("testsrcType.cpp", "Foo"); 
         {
             auto nameprofile = typeDict.FindVariable("coo");
@@ -208,7 +208,7 @@ bool TestNamespacedComplexType(){
 bool TestFunctionAndReturnTypeID(){
     std::string str = "std::string srcTypeNS::Foo(int a, double b){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
     
     try{
         auto findFunc = typeDict.FindFunction("Foo", 2);
@@ -226,7 +226,7 @@ bool TestFunctionAndReturnTypeID(){
 bool TestFindNoArgFunction(){
     std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
     
     try{
         auto findFunc = typeDict.FindFunction("Foo", 0);
@@ -241,7 +241,7 @@ bool TestFindNoArgFunction(){
 bool TestFindMutliNoArgFunction(){
     std::string str = "std::string Bar(){return \"hi\";} std::string Foo(){return \"hi\";} std::string Foo(){return \"hi\";}";
     std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
     
     try{
         auto findFunc = typeDict.FindFunction("Foo", 0);
@@ -261,7 +261,7 @@ bool TestFindMutliNoArgFunction(){
 bool TestFindMultiArgFunction(){
     std::string str = "std::string Foo(string abc, std::string onetwothree, std::vector<std::string> blee){static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
-    srcTypeNS::srcType typeDict(srcmlStr, 0);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
     try{
         auto findFunc = typeDict.FindFunction("Foo", 3);
         assert(findFunc.front().name == "Foo");
@@ -276,7 +276,7 @@ bool TestCollectCallData(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Boo(int a, int b){} double Boo(int a, double b, int c){} std::string Foo(int a, double b, std::string c){int c; double d; Boo(c, d, c);}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, false);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -287,7 +287,7 @@ bool TestCollectNestedCallData(){
     try{
         std::string str = "double Boo(int b){} double Foo(double x, double y){int a; Foo(y, Foo(x, y));}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, true);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -298,7 +298,7 @@ bool TestProbabilityFilter(){
     try{
         std::string str = "double Boo(int b, double e){} double Boo(double b, double c){} double Foo(double x, double y){int a; Foo(y, Foo(x, Boo(y, x)));}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, true);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -309,7 +309,7 @@ bool TestComputeLiteral(){
     try{
         std::string str = "double Boo(int b, std::string e){} double Foo(double x, double y){int a; Foo(y, Foo(5, Boo(y, \"x\")));}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, true);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -320,7 +320,7 @@ bool TestUnresolved(){
     try{
         std::string str = "double Boo(int b, std::string e){} double Boo(int b, std::string e, double c){} double Foo(int y){Boo(y, x+y);}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, true);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -330,7 +330,7 @@ bool TestCollectCallDataWithExpr(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
         std::string srcmlStr = StringToSrcML(str);
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr, true);
     }catch(std::runtime_error e){
         std::cerr<<e.what();
         assert(false);
@@ -345,7 +345,7 @@ bool TestNamespacedTypedefedType(){
     std::string str = "typedef int INTEGER; std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     try{
-        srcTypeNS::srcType typeDict(srcmlStr, 0);
+        srcTypeNS::srcType typeDict(srcmlStr);
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
     }
