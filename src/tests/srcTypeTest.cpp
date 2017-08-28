@@ -60,7 +60,7 @@ std::string StringToSrcML(std::string str){
     TrimFromEnd(ch, size);
     return std::string(ch);
 }
-bool TestPrimitiveTypes(){
+void TestPrimitiveTypes(){
     std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5; char array[30];}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, false);
@@ -98,10 +98,9 @@ bool TestPrimitiveTypes(){
     }catch(std::runtime_error e){
         std::cerr<<e.what();
     }
-    return true;
 }
 
-bool TestComplexType(){
+void TestComplexType(){
     std::string str = "int main(){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     try{
@@ -132,9 +131,8 @@ bool TestComplexType(){
     }catch(std::runtime_error e){
         std::cerr<<e.what();
     }
-    return true;
 }
-bool TestPrimitiveTypesMultiDecl(){
+void TestPrimitiveTypesMultiDecl(){
     std::string str = "int main(){int c = 5, v = a, e = 5+c;}";
     std::string srcmlStr = StringToSrcML(str);
     
@@ -167,9 +165,8 @@ bool TestPrimitiveTypesMultiDecl(){
     }catch(std::runtime_error e){
         std::cerr<<e.what();
     }
-    return true;
 }
-bool TestNamespacedComplexType(){
+void TestNamespacedComplexType(){
     std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     
@@ -203,9 +200,8 @@ bool TestNamespacedComplexType(){
     }catch(std::runtime_error e){
         std::cerr<<e.what();
     }
-    return true;
 }
-bool TestFunctionAndReturnTypeID(){
+void TestFunctionAndReturnTypeID(){
     std::string str = "std::string srcTypeNS::Foo(int a, double b){Object coo = 5; const Object ke_e4e = 5; static const Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, false);
@@ -221,9 +217,8 @@ bool TestFunctionAndReturnTypeID(){
         assert(false);
     }
 
-    return true;
 }
-bool TestFindNoArgFunction(){
+void TestFindNoArgFunction(){
     std::string str = "std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, false);
@@ -238,7 +233,7 @@ bool TestFindNoArgFunction(){
         assert(false);
     }
 }
-bool TestFindMutliNoArgFunction(){
+void TestFindMutliNoArgFunction(){
     std::string str = "std::string Bar(){return \"hi\";} std::string Foo(){return \"hi\";} std::string Foo(){return \"hi\";}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, false);
@@ -258,7 +253,7 @@ bool TestFindMutliNoArgFunction(){
     }
 
 }
-bool TestFindMultiArgFunction(){
+void TestFindMultiArgFunction(){
     std::string str = "std::string Foo(string abc, std::string onetwothree, std::vector<std::string> blee){static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     srcTypeNS::srcType typeDict(srcmlStr, false);
@@ -272,7 +267,7 @@ bool TestFindMultiArgFunction(){
         assert(false);
     }
 }
-bool TestCollectCallData(){
+void TestCollectCallData(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Boo(int a, int b){} double Boo(int a, double b, int c){} std::string Foo(int a, double b, std::string c){int c; double d; Boo(c, d, c);}";
         std::string srcmlStr = StringToSrcML(str);
@@ -282,7 +277,7 @@ bool TestCollectCallData(){
         assert(false);
     }
 }
-bool TestCollectNestedCallData(){
+void TestCollectNestedCallData(){
     std::cerr<<"TEST NESTED CALL"<<std::endl;
     try{
         std::string str = "double Boo(int b){} double Foo(double x, double y){int a; Foo(y, Foo(x, y));}";
@@ -293,7 +288,7 @@ bool TestCollectNestedCallData(){
         assert(false);
     }
 }
-bool TestProbabilityFilter(){
+void TestProbabilityFilter(){
     std::cerr<<"TEST FILTER"<<std::endl;
     try{
         std::string str = "double Boo(int b, double e){} double Boo(double b, double c){} double Foo(double x, double y){int a; Foo(y, Foo(x, Boo(y, x)));}";
@@ -304,7 +299,7 @@ bool TestProbabilityFilter(){
         assert(false);
     }
 }
-bool TestComputeLiteral(){
+void TestComputeLiteral(){
     std::cerr<<"TEST LITERAL"<<std::endl;
     try{
         std::string str = "double Boo(int b, std::string e){} double Foo(double x, double y){int a; Foo(y, Foo(5, Boo(y, \"x\")));}";
@@ -315,7 +310,7 @@ bool TestComputeLiteral(){
         assert(false);
     }
 }
-bool TestUnresolved(){
+void TestUnresolved(){
     std::cerr<<"TEST UNRESOLVED"<<std::endl;
     try{
         std::string str = "double Boo(int b, std::string e){} double Boo(int b, std::string e, double c){} double Foo(int y){Boo(y, x+y);}";
@@ -326,7 +321,7 @@ bool TestUnresolved(){
         assert(false);
     }
 }
-bool TestCollectCallDataWithExpr(){
+void TestCollectCallDataWithExpr(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Foo(int a){int c; double d; Boo(a+c, d);}";
         std::string srcmlStr = StringToSrcML(str);
@@ -337,11 +332,10 @@ bool TestCollectCallDataWithExpr(){
     }
 }
 /*
-bool TestTypedefedType(){
-    return true;
+void TestTypedefedType(){
 }
 
-bool TestNamespacedTypedefedType(){
+void TestNamespacedTypedefedType(){
     std::string str = "typedef int INTEGER; std::string Foo(){std::Object coo = 5; const std::Object ke_e4e = 5; static const std::Object caa34 = 5;}";
     std::string srcmlStr = StringToSrcML(str);
     try{
@@ -349,7 +343,6 @@ bool TestNamespacedTypedefedType(){
     }catch(SAXError e){
         std::cerr<<"ERROR: "<<e.message;
     }
-    return true;
 }
 
 
