@@ -83,7 +83,7 @@ namespace srcTypeNS{
                         try{
                             auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "testsrcType.cpp");
                             currentParameters.push_back(var.at(0));
-                            callStack.back().parameters.push_back(var.at(0).nameoftype);
+                            callStack.back().parameters.push_back(var.at(0).nameOfType);
                         }catch(std::runtime_error e){
                             std::cerr<<e.what();
                             if(currentAttrType == "type"){

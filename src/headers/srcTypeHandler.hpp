@@ -48,10 +48,10 @@ namespace srcTypeNS{
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier);
+                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier);
                     if(declCheck == srctypedata.variableMap.end()){
                         std::vector<DeclData> decldatavec = {decldata};
-                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameofidentifier, decldatavec));
+                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier, decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
                     }
@@ -62,14 +62,14 @@ namespace srcTypeNS{
                     
                     for(auto param : functionsigdata.parameters){
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameofidentifier);
+                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameOfIdentifier);
                         if(paramCheck == srctypedata.paramMap.end()){
                             std::vector<DeclData> paramdatavec = {param};
-                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameofidentifier, paramdatavec));
+                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameOfIdentifier, paramdatavec));
                         }else{
                             paramCheck->second.push_back(param);
                         }
-                        paramhash += param.nameofidentifier;
+                        paramhash += param.nameOfIdentifier;
                     }
                     
                     //Generate a string to be hashed for the function

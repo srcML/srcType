@@ -118,14 +118,14 @@ namespace srcTypeNS{
                         double  probability = 0, numParameters = 0, numTrue = 0;
                         if(func.parameters.size() == callParams.size()){
                             for(unsigned int i = 0; i< func.parameters.size(); ++i){
-                                if(callParams.at(i) == func.parameters.at(i).nameoftype){
+                                if(callParams.at(i) == func.parameters.at(i).nameOfType){
                                     ++numTrue;
                                 }else if(stringConversionTypes.find(callParams.at(i)) != stringConversionTypes.end()){ //Current param is a string literal type
-                                    if(stringConversionTypes.find(func.parameters.at(i).nameoftype) != stringConversionTypes.end()){
+                                    if(stringConversionTypes.find(func.parameters.at(i).nameOfType) != stringConversionTypes.end()){
                                         ++numTrue; //Ok, the argument in the original definition is convertable to string, so these might match
                                     }
                                 }else if (numberConversionTypes.find(callParams.at(i)) != numberConversionTypes.end()){ //Current param is a number literal type
-                                    if(numberConversionTypes.find(func.parameters.at(i).nameoftype) != numberConversionTypes.end()){
+                                    if(numberConversionTypes.find(func.parameters.at(i).nameOfType) != numberConversionTypes.end()){
                                         ++numTrue; //Ok, the argument in the original definition is convertable to some builtin number type, so these might match
                                     }
                                 }

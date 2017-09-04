@@ -28,19 +28,19 @@ int main(int argc, char** argv){
 	typeDict.SetContext("code.cpp", "Foo");
 	{
 		auto nameprofile = typeDict.FindVariable("coo");
-		std::cerr<<"Name: "<<nameprofile.front().nameofidentifier<<" Type: "<< nameprofile.front().nameoftype<<std::endl;
-		assert(nameprofile.front().nameoftype == "Object" 
-				&& typeDict.IsPrimitive(nameprofile.front().nameoftype) == false 
+		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
+		assert(nameprofile.front().nameOfType == "Object" 
+				&& typeDict.IsPrimitive(nameprofile.front().nameOfType) == false 
 				&& nameprofile.front().namespaces.front() == "std");
 	}
 	{
 		auto nameprofile = typeDict.FindVariable("ke_e4e");
-		std::cerr<<"Name: "<<nameprofile.front().nameofidentifier<<" Type: "<< nameprofile.front().nameoftype<<std::endl;
-	    assert(nameprofile.front().nameoftype == "Object" && typeDict.IsPrimitive(nameprofile.front().nameoftype) == false && nameprofile.front().isConst && nameprofile.front().namespaces.front() == "std");
+		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
+	    assert(nameprofile.front().nameOfType == "Object" && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConst && nameprofile.front().namespaces.front() == "std");
 	}
 	{
 		auto nameprofile = typeDict.FindVariable("caa34");
-		std::cerr<<"Name: "<<nameprofile.front().nameofidentifier<<" Type: "<< nameprofile.front().nameoftype<<std::endl;
-		assert(nameprofile.front().nameoftype == "Object" && typeDict.IsPrimitive(nameprofile.front().nameoftype) == false && nameprofile.front().isConst && nameprofile.front().namespaces.front() == "std");
+		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
+		assert(nameprofile.front().nameOfType == "Object" && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConst && nameprofile.front().namespaces.front() == "std");
 	}
 }
