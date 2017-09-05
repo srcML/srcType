@@ -46,6 +46,20 @@ namespace srcTypeNS{
                 currentfunctionname = function;
                 return true;
             }
+            //Allows side effects
+            std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string fileName){
+                auto varit = data.variableMap.find(fileName + functionName + varName);
+                auto paramit = data.paramMap.find(functionName + varName);
+                if(varit != data.variableMap.end()){
+                    return &(varit->second);
+                }else if (paramit != data.paramMap.end()){
+                    return &(paramit->second);
+                }else{
+                    throw std::runtime_error("Could not find identifier with key: " + currentfilename+" "+functionName+" "+varName + "\n");
+                }
+                return nullptr;
+            }
+
             //Assumes context was set
             std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string fileName) const{
                 auto varit = data.variableMap.find(fileName + functionName + varName);

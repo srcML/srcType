@@ -267,6 +267,27 @@ void TestFindMultiArgFunction(){
         assert(false);
     }
 }
+void TestWritableFind(){
+    std::string str = "int main(){int c = 5; const int v = 5; static const int e = 5; char array[30];}";
+    std::string srcmlStr = StringToSrcML(str);
+    srcTypeNS::srcType typeDict(srcmlStr, false);
+    try{
+        typeDict.SetContext("testsrcType.cpp", "main");
+        {
+            auto nameprofile = typeDict.FindIdentifierWrite("c", "main", "testsrcType.cpp");
+            std::cerr<<"Type1WRITEABLE: "<< nameprofile->front().nameOfType<<std::endl;
+            assert(nameprofile->front().nameOfType == "int");
+            assert(typeDict.IsPrimitive(nameprofile->front().nameOfType) == true);
+            nameprofile->front().nameOfType = "string";
+            auto nameprofile2 = typeDict.FindIdentifierWrite("c", "main", "testsrcType.cpp");
+            assert(nameprofile2->front().nameOfType == "string");
+        }
+    }catch(SAXError e){
+        std::cerr<<"ERROR: "<<e.message;
+    }catch(std::runtime_error e){
+        std::cerr<<e.what();
+    }
+}
 void TestCollectCallData(){
     try{
         std::string str = "std::string Boo(int a, double b){} std::string Boo(int a, int b){} double Boo(int a, double b, int c){} std::string Foo(int a, double b, std::string c){int c; double d; Boo(c, d, c);}";
@@ -331,6 +352,7 @@ void TestCollectCallDataWithExpr(){
         assert(false);
     }
 }
+
 /*
 void TestTypedefedType(){
 }
@@ -361,6 +383,7 @@ int main(int argc, char** argv){
     TestProbabilityFilter();
     TestComputeLiteral();
     TestUnresolved();
+    TestWritableFind();
     //TestNamespacedTypedefedType();
     //srcTypeNS::srcType typeDict;
     //typeDict.ReadArchiveFile(argv[1]);
