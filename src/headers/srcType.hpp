@@ -122,6 +122,15 @@ namespace srcTypeNS{
                 }
                 return std::vector<FunctionSignaturePolicy::SignatureData>();
             }
+            std::vector<FunctionSignaturePolicy::SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
+                auto it = data.functionMap.find(funcName);
+                if(it != data.functionMap.end()){
+                    return &(it->second);
+                }else{
+                    throw std::runtime_error("Could not find function with key: " + funcName + "\n");
+                }
+                return nullptr;
+            }
             typedef std::pair<double, FunctionSignaturePolicy::SignatureData> FunctionProbabilityPair;
             std::vector<FunctionProbabilityPair> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
                 std::vector<FunctionProbabilityPair> resultVec;
