@@ -50,8 +50,20 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::exprstmt)){
-                   std::cerr<<currentExprName<<" "<<currentFunctionName<<" "<<ctx.currentFilePath<<std::endl;
-                   auto test =dictionary->FindIdentifier(currentExprName, currentFunctionName, ctx.currentFilePath);
+                   std::cerr<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
+                    
+                    auto testlocal = dictionary->FindIdentifier(currentExprName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    if(!testlocal.empty()){
+                        std::cerr<<"Found locally: "<<testlocal.at(0).nameOfIdentifier<<std::endl;
+                    }else{
+                        auto testclass = dictionary->FindIdentifier(currentExprName, "", ctx.currentClassName, ctx.currentFilePath);
+                        if(!testclass.empty()){
+                            std::cerr<<"Found in class: "<<testclass.at(0).nameOfIdentifier<<std::endl;
+                        }else{
+                            std::cerr<<"COULD NOT FIND: "<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
+                        }
+                    }
+                   
                    std::cerr<<"EXPRNAME: "<<currentExprName<<std::endl;
                 }
             };
@@ -63,12 +75,6 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                         currentExprName = ctx.currentToken;
                     }
                 }
-                if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    currentFunctionName = ctx.currentToken;
-                }
-            };
-            closeEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
-                currentFunctionName.clear();
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);

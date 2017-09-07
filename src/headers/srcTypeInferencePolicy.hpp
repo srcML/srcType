@@ -81,7 +81,7 @@ namespace srcTypeNS{
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist) && !argumentexpr.empty()){
                         try{
-                            auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "testsrcType.cpp");
+                            auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "","testsrcType.cpp");
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameOfType);
                         }catch(std::runtime_error e){

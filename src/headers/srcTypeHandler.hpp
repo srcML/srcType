@@ -48,10 +48,10 @@ namespace srcTypeNS{
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier);
+                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier);
                     if(declCheck == srctypedata.variableMap.end()){
                         std::vector<DeclData> decldatavec = {decldata};
-                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier, decldatavec));
+                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
                     }
