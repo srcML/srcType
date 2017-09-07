@@ -80,12 +80,12 @@ namespace srcTypeNS{
                 the name.  If parent function call was seen */
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist) && !argumentexpr.empty()){
-                        try{
-                            auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "","testsrcType.cpp");
+                        auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "","testsrcType.cpp");
+                        if(!var.empty()){
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameOfType);
-                        }catch(std::runtime_error e){
-                            std::cerr<<e.what();
+                        }else{
+                            std::cerr<<"Couldn't find argumentexpr"<<std::endl;
                             if(currentAttrType == "type"){
                                 std::cerr<<"Oh, it's a "<<currentAttr<<". Repairing and marking as a "<<currentAttr<<"."<<std::endl;
                                 callStack.back().parameters.push_back(currentAttr);
