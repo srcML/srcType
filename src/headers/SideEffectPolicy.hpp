@@ -39,12 +39,17 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
     private:
         srcTypeNS::srcType* dictionary;
         std::string currentFunctionName, currentExprName, currentModifier, currentSpecifier;
+        std::vector<DeclData>* currentDecl;
         bool seenAssignment;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.currentToken == "="){
                     seenAssignment = true;
+                    for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                        std::cerr<<"SIDE EFFECTS: "<<it->nameOfIdentifier<<std::endl;
+                        it->hasSideEffect = true;
+                    }
                 }
             };
 
@@ -52,19 +57,17 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 if(ctx.IsOpen(ParserState::exprstmt)){
                    std::cerr<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
                     
-                    auto testlocal = dictionary->FindIdentifier(currentExprName, ctx.currentFunctionName, "", ctx.currentFilePath);
-                    if(!testlocal.empty()){
-                        std::cerr<<"Found locally: "<<testlocal.at(0).nameOfIdentifier<<std::endl;
+                    currentDecl = dictionary->FindIdentifierWrite(currentExprName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    if(currentDecl && !currentDecl->empty()){
+                        std::cerr<<"Found locally: "<<currentDecl->at(0).nameOfIdentifier<<std::endl;
                     }else{
-                        auto testclass = dictionary->FindIdentifier(currentExprName, "", ctx.currentClassName, ctx.currentFilePath);
-                        if(!testclass.empty()){
-                            std::cerr<<"Found in class: "<<testclass.at(0).nameOfIdentifier<<std::endl;
+                        currentDecl = dictionary->FindIdentifierWrite(currentExprName, "", ctx.currentClassName, ctx.currentFilePath);
+                        if(currentDecl && !currentDecl->empty()){
+                            std::cerr<<"Found in class: "<<currentDecl->at(0).nameOfIdentifier<<std::endl;
                         }else{
                             std::cerr<<"COULD NOT FIND: "<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
                         }
                     }
-                   
-                   std::cerr<<"EXPRNAME: "<<currentExprName<<std::endl;
                 }
             };
 
@@ -74,6 +77,11 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
                     }
+                }
+            };
+            closeEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx){
+                if(ctx.IsOpen(ParserState::returnstmt)){
+                    std::cerr<<ctx.currentToken<<std::endl;
                 }
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){

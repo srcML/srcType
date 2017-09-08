@@ -63,6 +63,7 @@ int main(int argc, char** filename){
 			y = k - 1;\n\
 			i = j + k;\n\
 			foo(abc+doreme);\n\
+			return y2 + y3;\n\
 		}\n\
 	};";
 

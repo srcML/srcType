@@ -274,12 +274,11 @@ void TestWritableFind(){
     try{
         typeDict.SetContext("testsrcType.cpp", "main");
         {
-            auto nameprofile = typeDict.FindIdentifierWrite("c", "main", "testsrcType.cpp");
-            std::cerr<<"Type1WRITEABLE: "<< nameprofile->front().nameOfType<<std::endl;
+            auto nameprofile = typeDict.FindIdentifierWrite("c", "main", "", "testsrcType.cpp");
             assert(nameprofile->front().nameOfType == "int");
             assert(typeDict.IsPrimitive(nameprofile->front().nameOfType) == true);
             nameprofile->front().nameOfType = "string";
-            auto nameprofile2 = typeDict.FindIdentifierWrite("c", "main", "testsrcType.cpp");
+            auto nameprofile2 = typeDict.FindIdentifierWrite("c", "main", "", "testsrcType.cpp");
             assert(nameprofile2->front().nameOfType == "string");
         }
     }catch(SAXError e){

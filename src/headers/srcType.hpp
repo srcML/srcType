@@ -47,35 +47,33 @@ namespace srcTypeNS{
                 return true;
             }
             //Allows side effects
-            std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string fileName){
-                auto varit = data.variableMap.find(fileName + functionName + varName);
+            std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string classname, std::string fileName){
+                std::cerr<<"Lookup: "<<fileName + functionName + classname + varName<<std::endl;
+                auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
+                    std::cerr<<"Seg 1"<<std::endl;
                     return &(varit->second);
                 }else if (paramit != data.paramMap.end()){
+                    std::cerr<<"Seg 2"<<std::endl;
                     return &(paramit->second);
                 }else{
-                    throw std::runtime_error("Could not find identifier with key: " + fileName+" "+functionName+" "+varName + "\n");
+                    std::cerr<<"Seg 3"<<std::endl;
+                    return nullptr;
                 }
-                return nullptr;
             }
 
-            //Assumes context was set
             std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string classname, std::string fileName) const{
                 std::cerr<<"Lookup: "<<fileName + functionName + classname + varName<<std::endl;
                 auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
-                    std::cerr<<"Seg"<<std::endl;
                     return varit->second;
                 }else if (paramit != data.paramMap.end()){
-                    std::cerr<<"Seg2"<<std::endl;
                     return paramit->second;
                 }else{
-                    std::cerr<<"Seg3"<<std::endl;
                     return std::vector<DeclData>();
                 }
-                return std::vector<DeclData>();
             }
             //Assumes context was set
             std::vector<DeclData> FindVariable(std::string varName) const{
