@@ -38,36 +38,39 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
         void * DataInner() const override {return (void*)0;}
     private:
         srcTypeNS::srcType* dictionary;
-        std::string currentFunctionName, currentExprName, currentModifier, currentSpecifier;
+        std::string currentFunctionName, currentExprName, currentDeclName, currentModifier, currentSpecifier;
         std::vector<DeclData>* currentDecl;
         bool seenAssignment;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+            openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
+                seenAssignment = true;
+                for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                    it->hasSideEffect = true;
+                }
+            };
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.currentToken == "="){
                     seenAssignment = true;
                     for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
-                        std::cerr<<"SIDE EFFECTS: "<<it->nameOfIdentifier<<std::endl;
                         it->hasSideEffect = true;
                     }
                 }
             };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsOpen(ParserState::exprstmt)){
-                   std::cerr<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
-                    
-                    currentDecl = dictionary->FindIdentifierWrite(currentExprName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                if(ctx.Or({ParserState::exprstmt, ParserState::declstmt}) && ctx.Nor({ParserState::type, ParserState::call})){
+                    std::string currentName = currentExprName.empty() ? currentDeclName : currentExprName;
+                    currentDecl = dictionary->FindIdentifierWrite(currentName, ctx.currentFunctionName, "", ctx.currentFilePath);
                     if(currentDecl && !currentDecl->empty()){
-                        std::cerr<<"Found locally: "<<currentDecl->at(0).nameOfIdentifier<<std::endl;
                     }else{
-                        currentDecl = dictionary->FindIdentifierWrite(currentExprName, "", ctx.currentClassName, ctx.currentFilePath);
+                        currentDecl = dictionary->FindIdentifierWrite(currentName, "", ctx.currentClassName, ctx.currentFilePath);
                         if(currentDecl && !currentDecl->empty()){
-                            std::cerr<<"Found in class: "<<currentDecl->at(0).nameOfIdentifier<<std::endl;
                         }else{
-                            std::cerr<<"COULD NOT FIND: "<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
                         }
                     }
+                    currentExprName.clear();
+                    currentDeclName.clear();
                 }
             };
 
@@ -77,11 +80,14 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
                     }
+                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) &&
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier})){
+                        currentDeclName = ctx.currentToken;
+                    }
                 }
             };
             closeEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::returnstmt)){
-                    std::cerr<<ctx.currentToken<<std::endl;
                 }
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){

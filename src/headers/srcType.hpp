@@ -48,23 +48,18 @@ namespace srcTypeNS{
             }
             //Allows side effects
             std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string classname, std::string fileName){
-                std::cerr<<"Lookup: "<<fileName + functionName + classname + varName<<std::endl;
                 auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
-                    std::cerr<<"Seg 1"<<std::endl;
                     return &(varit->second);
                 }else if (paramit != data.paramMap.end()){
-                    std::cerr<<"Seg 2"<<std::endl;
                     return &(paramit->second);
                 }else{
-                    std::cerr<<"Seg 3"<<std::endl;
                     return nullptr;
                 }
             }
 
             std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string classname, std::string fileName) const{
-                std::cerr<<"Lookup: "<<fileName + functionName + classname + varName<<std::endl;
                 auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
