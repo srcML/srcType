@@ -30,7 +30,7 @@ namespace srcTypeNS{
     struct srcTypeData{
         std::unordered_map<std::string, std::vector<DeclData>> paramMap;
         std::unordered_map<std::string, std::vector<DeclData>> variableMap;
-        std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
+        std::unordered_map<std::string, std::vector<SignatureData>> functionMap;
     };
     class srcTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
@@ -50,6 +50,7 @@ namespace srcTypeNS{
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier);
                     if(declCheck == srctypedata.variableMap.end()){
+                        decldata.sigdata = &functionsigdata;
                         std::vector<DeclData> decldatavec = {decldata};
                         srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
                     }else{
@@ -57,7 +58,7 @@ namespace srcTypeNS{
                     }
                 }else if(ctx.IsClosed(ParserState::declstmt)){
                     //Grab data
-                    functionsigdata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
+                    functionsigdata = *policy->Data<SignatureData>();
                     std::string paramhash;
                     
                     for(auto param : functionsigdata.parameters){
@@ -78,7 +79,7 @@ namespace srcTypeNS{
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto functionCheck = srctypedata.functionMap.find(fullhash);
                     if(functionCheck == srctypedata.functionMap.end()){
-                        std::vector<FunctionSignaturePolicy::SignatureData> functionsigdatavec = {functionsigdata};
+                        std::vector<SignatureData> functionsigdatavec = {functionsigdata};
                         srctypedata.functionMap.insert(std::make_pair(fullhash, functionsigdatavec));
                     }else{
                         functionCheck->second.push_back(functionsigdata);
@@ -103,7 +104,7 @@ namespace srcTypeNS{
             DeclData decldata;
 
             FunctionSignaturePolicy functionpolicy;
-            FunctionSignaturePolicy::SignatureData functionsigdata;
+            SignatureData functionsigdata;
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;

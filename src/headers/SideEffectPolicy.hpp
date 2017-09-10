@@ -46,6 +46,10 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
                 seenAssignment = true;
                 for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                    if(it->isParameter && !dictionary->IsPrimitive(it->nameOfType) && (it->isPointer || it->isReference || it->usesSubscript) && !it->isConstAlias){
+                        //containing function has a side effect
+
+                    }
                     it->hasSideEffect = true;
                 }
             };
@@ -53,6 +57,11 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 if(ctx.currentToken == "="){
                     seenAssignment = true;
                     for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                        auto func = FindFunctionWrite(it->nameOfContainingFunction, it->numberOfContainingFunctionParams);
+                        if(it->isParameter && !dictionary->IsPrimitive(it->nameOfType) && (it->isPointer || it->isReference || it->usesSubscript) && !it->isConstAlias){
+                            //containing function has a side effect
+                            std::cerr<<"Function has a side effect";
+                        }
                         it->hasSideEffect = true;
                     }
                 }
@@ -62,12 +71,8 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 if(ctx.Or({ParserState::exprstmt, ParserState::declstmt}) && ctx.Nor({ParserState::type, ParserState::call})){
                     std::string currentName = currentExprName.empty() ? currentDeclName : currentExprName;
                     currentDecl = dictionary->FindIdentifierWrite(currentName, ctx.currentFunctionName, "", ctx.currentFilePath);
-                    if(currentDecl && !currentDecl->empty()){
-                    }else{
+                    if(!currentDecl || currentDecl->empty()){
                         currentDecl = dictionary->FindIdentifierWrite(currentName, "", ctx.currentClassName, ctx.currentFilePath);
-                        if(currentDecl && !currentDecl->empty()){
-                        }else{
-                        }
                     }
                     currentExprName.clear();
                     currentDeclName.clear();

@@ -104,8 +104,8 @@ namespace srcTypeNS{
             }
             
 
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, int numParams) {
-                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
+            std::vector<SignatureData> FindFunction(std::string funcName, int numParams) {
+                std::vector<SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);
                 if(it != data.functionMap.end()){
                     for(auto func : it->second){
@@ -117,9 +117,9 @@ namespace srcTypeNS{
                 }else{
                     throw std::runtime_error("Could not find function with key: " + funcName + "\n");
                 }
-                return std::vector<FunctionSignaturePolicy::SignatureData>();
+                return std::vector<SignatureData>();
             }
-            std::vector<FunctionSignaturePolicy::SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
+            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
                 auto it = data.functionMap.find(funcName);
                 if(it != data.functionMap.end()){
                     return &(it->second);
@@ -128,7 +128,7 @@ namespace srcTypeNS{
                 }
                 return nullptr;
             }
-            typedef std::pair<double, FunctionSignaturePolicy::SignatureData> FunctionProbabilityPair;
+            typedef std::pair<double, SignatureData> FunctionProbabilityPair;
             std::vector<FunctionProbabilityPair> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
                 std::vector<FunctionProbabilityPair> resultVec;
                 auto it = data.functionMap.find(funcName);

@@ -79,8 +79,9 @@ int main(int argc, char** filename){
 	"class object{\n\
 		int x;\n\
 		Foo y;\n\
-		std::string foo(int i, double j){\n\
+		std::string foo(int i, double j, const obj* r){\n\
 			object y2 = x;\n\
+			r = 0;\n\
 			object u;\n\
 			j = 0;\n\
 			float k;\n\
