@@ -66,6 +66,9 @@ class TestSideEffect : public srcSAXEventDispatch::PolicyDispatcher, public srcS
 			if(id.nameOfIdentifier == "x"){
 				assert(id.hasSideEffect == false);
 			}
+			if(id.nameOfIdentifier == "q"){
+				assert(id.hasSideEffect == false);
+			}
 		}
     protected:
         void * DataInner() const override {
@@ -79,7 +82,7 @@ int main(int argc, char** filename){
 	"class object{\n\
 		int x;\n\
 		Foo y;\n\
-		std::string foo(int i, double j, const obj* r){\n\
+		std::string foo(int i, double j, const obj* r, Object q){\n\
 			object y2 = x;\n\
 			r = 0;\n\
 			object u;\n\
@@ -88,7 +91,7 @@ int main(int argc, char** filename){
 			y = k - 1;\n\
 			i = j + k;\n\
 			foo(abc+doreme);\n\
-			return y2 + y3;\n\
+			return y;\n\
 		}\n\
 	};";
 
@@ -102,11 +105,11 @@ int main(int argc, char** filename){
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<> handler {sepolicy};
     control.parse(&handler); //Start parsing
-
+/*
     for(auto data : dictionary->data.variableMap){
     	setest.RunTest(data.second);
     }
     for(auto data : dictionary->data.paramMap){
     	setest.RunTest(data.second);
-    }
+    }*/
 }

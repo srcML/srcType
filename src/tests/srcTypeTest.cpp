@@ -71,6 +71,7 @@ void TestPrimitiveTypes(){
             std::cerr<<"Type1: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "int");
             assert(typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
+            std::cerr<<nameprofile.front().sigdata->name<<std::endl;
         }
         {
             auto nameprofile = typeDict.FindVariable("v");
