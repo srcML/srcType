@@ -30,7 +30,7 @@ namespace srcTypeNS{
     struct srcTypeData{
         std::unordered_map<std::string, std::vector<DeclData>> paramMap;
         std::unordered_map<std::string, std::vector<DeclData>> variableMap;
-        std::unordered_map<std::string, std::vector<FunctionSignaturePolicy::SignatureData>> functionMap;
+        std::unordered_map<std::string, std::vector<SignatureData>> functionMap;
     };
     class srcTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener 
     {
@@ -40,6 +40,7 @@ namespace srcTypeNS{
                 InitializeEventHandlers();
                 declpolicy.AddListener(this);
                 functionpolicy.AddListener(this);
+                funcSigIt = srctypedata.functionMap.end();
             }
     
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
@@ -48,22 +49,38 @@ namespace srcTypeNS{
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier);
+                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier);
                     if(declCheck == srctypedata.variableMap.end()){
+                        if(funcSigIt != srctypedata.functionMap.end()){
+                            decldata.sigdata = &funcSigIt->second.back(); //address of function signature data in map
+                        }
+
                         std::vector<DeclData> decldatavec = {decldata};
-                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfIdentifier, decldatavec));
+                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
                     }
                 }else if(ctx.IsClosed(ParserState::declstmt)){
                     //Grab data
-                    functionsigdata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
+                    functionsigdata = *policy->Data<SignatureData>();
+
+                    //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
+                    auto functionCheck = srctypedata.functionMap.find(functionsigdata.name);
+                    if(functionCheck == srctypedata.functionMap.end()){
+                        std::vector<SignatureData> functionsigdatavec = {functionsigdata};
+                        funcSigIt = srctypedata.functionMap.insert(std::make_pair(functionsigdata.name, functionsigdatavec)).first;
+                    }else{
+                        funcSigIt = functionCheck;
+                        functionCheck->second.push_back(functionsigdata);
+                    }
+
                     std::string paramhash;
                     
                     for(auto param : functionsigdata.parameters){
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                         auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameOfIdentifier);
                         if(paramCheck == srctypedata.paramMap.end()){
+                            param.sigdata = &funcSigIt->second.back();
                             std::vector<DeclData> paramdatavec = {param};
                             srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameOfIdentifier, paramdatavec));
                         }else{
@@ -72,17 +89,6 @@ namespace srcTypeNS{
                         paramhash += param.nameOfIdentifier;
                     }
                     
-                    //Generate a string to be hashed for the function
-                    std::string fullhash = functionsigdata.name;
-                    
-                    //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                    auto functionCheck = srctypedata.functionMap.find(fullhash);
-                    if(functionCheck == srctypedata.functionMap.end()){
-                        std::vector<FunctionSignaturePolicy::SignatureData> functionsigdatavec = {functionsigdata};
-                        srctypedata.functionMap.insert(std::make_pair(fullhash, functionsigdatavec));
-                    }else{
-                        functionCheck->second.push_back(functionsigdata);
-                    }
                 }
             }
             srcTypeData GetDictionary()const {
@@ -98,12 +104,14 @@ namespace srcTypeNS{
             bool inClass;
 
             srcTypeData srctypedata;
+            
+            std::unordered_map<std::string, std::vector<SignatureData>>::iterator funcSigIt;
 
             DeclTypePolicy declpolicy;
             DeclData decldata;
 
             FunctionSignaturePolicy functionpolicy;
-            FunctionSignaturePolicy::SignatureData functionsigdata;
+            SignatureData functionsigdata;
             
             void InitializeEventHandlers(){
                 using namespace srcSAXEventDispatch;
@@ -119,6 +127,9 @@ namespace srcTypeNS{
                 };
                 openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){
                     ctx.dispatcher->RemoveListenerDispatch(&functionpolicy);
+                };
+                closeEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
+                    funcSigIt = srctypedata.functionMap.end();
                 };
                 //closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
             }

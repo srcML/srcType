@@ -80,16 +80,17 @@ namespace srcTypeNS{
                 the name.  If parent function call was seen */
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist) && !argumentexpr.empty()){
-                        try{
-                            auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "testsrcType.cpp");
+                        auto var = dictionary->FindIdentifier(argumentexpr, currentFunctionName, "","testsrcType.cpp");
+                        if(!var.empty()){
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameOfType);
-                        }catch(std::runtime_error e){
-                            std::cerr<<e.what();
+                        }else{
+                            std::cerr<<"Couldn't find "<< argumentexpr<<". Attempting a type conversion..."<<std::endl;
                             if(currentAttrType == "type"){
-                                std::cerr<<"Oh, it's a "<<currentAttr<<". Repairing and marking as a "<<currentAttr<<"."<<std::endl;
+                                std::cerr<<"Successfully converted to "<<currentAttr<<std::endl;
                                 callStack.back().parameters.push_back(currentAttr);
                             }else{
+                                std::cerr<<"Failed, marking as unresolved"<<std::endl;
                                 callStack.back().parameters.push_back("unresolved");
                             }
                         }
@@ -104,9 +105,6 @@ namespace srcTypeNS{
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
-                        const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
-                        const unsigned int NESTED_CALL_RESOLVED = 1;
-
                         auto filteredFunctionList = dictionary->FindFunction(callStack.back().callName, callStack.back().parameters);
                         for(auto function : filteredFunctionList){
                             data.push_back(srcTypeInferenceData(function.second.name, function.second.returnType));

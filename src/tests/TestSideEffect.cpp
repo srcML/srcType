@@ -43,7 +43,33 @@ class TestSideEffect : public srcSAXEventDispatch::PolicyDispatcher, public srcS
         ~TestSideEffect(){}
         TestSideEffect(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
-		void RunTest(){}
+		void RunTest(std::vector<DeclData> testvec){
+			auto id = testvec.at(0);
+			if(id.nameOfIdentifier == "j"){
+				assert(id.hasSideEffect == true);
+			}
+			if(id.nameOfIdentifier == "y"){
+				assert(id.hasSideEffect == true);
+			}
+			if(id.nameOfIdentifier == "i"){
+				assert(id.hasSideEffect == true);
+			}
+			if(id.nameOfIdentifier == "k"){
+				assert(id.hasSideEffect == false);
+			}
+			if(id.nameOfIdentifier == "y2"){
+				assert(id.hasSideEffect == true);
+			}
+			if(id.nameOfIdentifier == "u"){
+				assert(id.hasSideEffect == false);
+			}
+			if(id.nameOfIdentifier == "x"){
+				assert(id.hasSideEffect == false);
+			}
+			if(id.nameOfIdentifier == "q"){
+				assert(id.hasSideEffect == false);
+			}
+		}
     protected:
         void * DataInner() const override {
             return (void*)0; //To silence the warning
@@ -56,13 +82,16 @@ int main(int argc, char** filename){
 	"class object{\n\
 		int x;\n\
 		Foo y;\n\
-		std::string foo(int i, double j){\n\
+		std::string foo(int i, double j, const obj* r, Object q){\n\
 			object y2 = x;\n\
+			r = 0;\n\
+			object u;\n\
 			j = 0;\n\
 			float k;\n\
 			y = k - 1;\n\
 			i = j + k;\n\
 			foo(abc+doreme);\n\
+			return y;\n\
 		}\n\
 	};";
 
@@ -70,8 +99,17 @@ int main(int argc, char** filename){
 	auto dictionary = new srcTypeNS::srcType(srcmlstr, false);
 	std::cerr<<srcmlstr<<std::endl;
 
+	TestSideEffect setest;
+
     SideEffectPolicy* sepolicy = new SideEffectPolicy(dictionary);
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<> handler {sepolicy};
     control.parse(&handler); //Start parsing
+/*
+    for(auto data : dictionary->data.variableMap){
+    	setest.RunTest(data.second);
+    }
+    for(auto data : dictionary->data.paramMap){
+    	setest.RunTest(data.second);
+    }*/
 }
