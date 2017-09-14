@@ -44,7 +44,18 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.currentToken == "="){
-                    seenAssignment = true;
+                    for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                        it->hasSideEffect = true;
+                        if(it->isParameter){
+                            if((it->isPointer || it->isReference) && !it->isConstAlias){
+                                currentSig->at(0).hasSideEffect = true;    
+                            }
+                        }else{
+                            if(it->isClassMember){
+                                currentSig->at(0).hasSideEffect = true;
+                            }
+                        }
+                    }
                 }
             };
 
@@ -73,6 +84,15 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
+                    }
+                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) &&
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier})){
+                        currentDeclName = ctx.currentToken;
+                    }
+                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::parameter}) && 
+                        ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, 
+                        ParserState::init, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                        currentDeclName = ctx.currentToken;
                     }
                 }
             };
