@@ -30,19 +30,28 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
         ~SideEffectPolicy(){}
         SideEffectPolicy(srcTypeNS::srcType* dict, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             dictionary = dict;
-            seenAssignment = false;
+            currentSig = nullptr;
+            numParams = 0;
             InitializeEventHandlers();
         }
+        int numParams;
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {return (void*)0;}
     private:
         srcTypeNS::srcType* dictionary;
-        std::string currentFunctionName, currentExprName, currentModifier, currentSpecifier;
-        bool seenAssignment;
+        std::string currentExprName, currentDeclName;
+        std::vector<DeclData>* currentDecl;
+        std::vector<SignatureData>* currentSig;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+            openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
+                for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
+                    it->hasSideEffect = true;
+                }
+            };
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                //can't have side effect on class members
                 if(ctx.currentToken == "="){
                     for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
                         it->hasSideEffect = true;
@@ -54,28 +63,34 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                             if(it->isClassMember){
                                 currentSig->at(0).hasSideEffect = true;
                             }
+
                         }
                     }
                 }
             };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsOpen(ParserState::exprstmt)){
-                   std::cerr<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
-                    
-                    auto testlocal = dictionary->FindIdentifier(currentExprName, ctx.currentFunctionName, "", ctx.currentFilePath);
-                    if(!testlocal.empty()){
-                        std::cerr<<"Found locally: "<<testlocal.at(0).nameOfIdentifier<<std::endl;
-                    }else{
-                        auto testclass = dictionary->FindIdentifier(currentExprName, "", ctx.currentClassName, ctx.currentFilePath);
-                        if(!testclass.empty()){
-                            std::cerr<<"Found in class: "<<testclass.at(0).nameOfIdentifier<<std::endl;
-                        }else{
-                            std::cerr<<"COULD NOT FIND: "<<currentExprName<<" "<<ctx.currentFunctionName<<" "<<ctx.currentClassName<<" "<<ctx.currentFilePath<<std::endl;
+                if(ctx.Or({ParserState::exprstmt, ParserState::declstmt}) && ctx.Nor({ParserState::type, ParserState::call})){
+                    std::string currentName = currentExprName.empty() ? currentDeclName : currentExprName;
+                    currentDecl = dictionary->FindIdentifierWrite(currentName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    if(!currentDecl || currentDecl->empty()){
+                        currentDecl = dictionary->FindIdentifierWrite(currentName, "", ctx.currentClassName, ctx.currentFilePath);
+                    }
+                    currentExprName.clear();
+                    currentDeclName.clear();
+                }
+
+                //Can't return something with side effect
+                if(ctx.IsOpen(ParserState::returnstmt)){
+                    currentDecl = dictionary->FindIdentifierWrite(ctx.currentToken, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    if(!currentDecl || currentDecl->empty()){
+                        currentDecl = dictionary->FindIdentifierWrite(ctx.currentToken, "", ctx.currentClassName, ctx.currentFilePath);
+                    }
+                    for(auto declit = currentDecl->begin(); declit != currentDecl->end(); ++declit){
+                        if(declit->hasSideEffect){
+                            currentSig->at(0).hasSideEffect = true;
                         }
                     }
-                   
-                   std::cerr<<"EXPRNAME: "<<currentExprName<<std::endl;
                 }
             };
 
@@ -96,9 +111,22 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                     }
                 }
             };
+            closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
+                ++numParams;
+                currentDecl = dictionary->FindIdentifierWrite(currentDeclName, ctx.currentFunctionName, "", ctx.currentFilePath);
+            };
+            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx){
+                currentSig = dictionary->FindFunctionWrite(ctx.currentFunctionName, numParams);
+                numParams = 0;
+            };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
-                NotifyAll(ctx);
-                seenAssignment = false;
+                currentDecl = nullptr;
+            };
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
+                currentDecl = nullptr;
+            };
+            closeEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
+                currentSig = nullptr;
             };
 
         }

@@ -85,11 +85,12 @@ namespace srcTypeNS{
                             currentParameters.push_back(var.at(0));
                             callStack.back().parameters.push_back(var.at(0).nameOfType);
                         }else{
-                            std::cerr<<"Couldn't find argumentexpr"<<std::endl;
+                            std::cerr<<"Couldn't find "<< argumentexpr<<". Attempting a type conversion..."<<std::endl;
                             if(currentAttrType == "type"){
-                                std::cerr<<"Oh, it's a "<<currentAttr<<". Repairing and marking as a "<<currentAttr<<"."<<std::endl;
+                                std::cerr<<"Successfully converted to "<<currentAttr<<std::endl;
                                 callStack.back().parameters.push_back(currentAttr);
                             }else{
+                                std::cerr<<"Failed, marking as unresolved"<<std::endl;
                                 callStack.back().parameters.push_back("unresolved");
                             }
                         }
@@ -104,9 +105,6 @@ namespace srcTypeNS{
                 };
                 closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsClosed(ParserState::genericargumentlist)){
-                        const unsigned int ONLY_ONE_FUNCTION_IN_RESULT = 1;
-                        const unsigned int NESTED_CALL_RESOLVED = 1;
-
                         auto filteredFunctionList = dictionary->FindFunction(callStack.back().callName, callStack.back().parameters);
                         for(auto function : filteredFunctionList){
                             data.push_back(srcTypeInferenceData(function.second.name, function.second.returnType));

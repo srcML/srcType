@@ -47,35 +47,28 @@ namespace srcTypeNS{
                 return true;
             }
             //Allows side effects
-            std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string fileName){
-                auto varit = data.variableMap.find(fileName + functionName + varName);
+            std::vector<DeclData>* FindIdentifierWrite(std::string varName, std::string functionName, std::string classname, std::string fileName){
+                auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
                     return &(varit->second);
                 }else if (paramit != data.paramMap.end()){
                     return &(paramit->second);
                 }else{
-                    throw std::runtime_error("Could not find identifier with key: " + fileName+" "+functionName+" "+varName + "\n");
+                    return nullptr;
                 }
-                return nullptr;
             }
 
-            //Assumes context was set
             std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string classname, std::string fileName) const{
-                std::cerr<<"Lookup: "<<fileName + functionName + classname + varName<<std::endl;
                 auto varit = data.variableMap.find(fileName + functionName + classname + varName);
                 auto paramit = data.paramMap.find(functionName + varName);
                 if(varit != data.variableMap.end()){
-                    std::cerr<<"Seg"<<std::endl;
                     return varit->second;
                 }else if (paramit != data.paramMap.end()){
-                    std::cerr<<"Seg2"<<std::endl;
                     return paramit->second;
                 }else{
-                    std::cerr<<"Seg3"<<std::endl;
                     return std::vector<DeclData>();
                 }
-                return std::vector<DeclData>();
             }
             //Assumes context was set
             std::vector<DeclData> FindVariable(std::string varName) const{
@@ -111,8 +104,8 @@ namespace srcTypeNS{
             }
             
 
-            std::vector<FunctionSignaturePolicy::SignatureData> FindFunction(std::string funcName, int numParams) {
-                std::vector<FunctionSignaturePolicy::SignatureData> resultVec;
+            std::vector<SignatureData> FindFunction(std::string funcName, int numParams) {
+                std::vector<SignatureData> resultVec;
                 auto it = data.functionMap.find(funcName);
                 if(it != data.functionMap.end()){
                     for(auto func : it->second){
@@ -124,9 +117,9 @@ namespace srcTypeNS{
                 }else{
                     throw std::runtime_error("Could not find function with key: " + funcName + "\n");
                 }
-                return std::vector<FunctionSignaturePolicy::SignatureData>();
+                return std::vector<SignatureData>();
             }
-            std::vector<FunctionSignaturePolicy::SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
+            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
                 auto it = data.functionMap.find(funcName);
                 if(it != data.functionMap.end()){
                     return &(it->second);
@@ -135,7 +128,7 @@ namespace srcTypeNS{
                 }
                 return nullptr;
             }
-            typedef std::pair<double, FunctionSignaturePolicy::SignatureData> FunctionProbabilityPair;
+            typedef std::pair<double, SignatureData> FunctionProbabilityPair;
             std::vector<FunctionProbabilityPair> FindFunction(std::string funcName, const std::vector<std::string>& callParams) {
                 std::vector<FunctionProbabilityPair> resultVec;
                 auto it = data.functionMap.find(funcName);

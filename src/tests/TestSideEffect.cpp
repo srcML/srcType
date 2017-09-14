@@ -104,11 +104,14 @@ int main(int argc, char** filename){
 		Obj blee;\n\
 		std::string foo(int i, double j, const obj* r, Object q){\n\
 			object y2 = x;\n\
+			r = 0;\n\
+			object u;\n\
 			j = 0;\n\
 			float k;\n\
 			y = k - 1;\n\
 			i = j + k;\n\
 			foo(abc+doreme);\n\
+			return y;\n\
 		}\n\
 		Object barfoo2(){blee = 3;}\n\
 	};\n\
@@ -120,6 +123,8 @@ int main(int argc, char** filename){
 	std::string srcmlstr = StringToSrcML(codestr);
 	auto dictionary = new srcTypeNS::srcType(srcmlstr, false);
 	std::cerr<<srcmlstr<<std::endl;
+
+	TestSideEffect setest;
 
     SideEffectPolicy* sepolicy = new SideEffectPolicy(dictionary);
     srcSAXController control(srcmlstr);
