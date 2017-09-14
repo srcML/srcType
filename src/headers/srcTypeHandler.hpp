@@ -52,9 +52,8 @@ namespace srcTypeNS{
                     auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier);
                     if(declCheck == srctypedata.variableMap.end()){
                         if(funcSigIt != srctypedata.functionMap.end()){
-                            decldata.sigdata = &funcSigIt->second.back(); //address of function signature data in map
+                            decldata.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
                         }
-
                         std::vector<DeclData> decldatavec = {decldata};
                         srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
                     }else{
@@ -80,7 +79,9 @@ namespace srcTypeNS{
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                         auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameOfIdentifier);
                         if(paramCheck == srctypedata.paramMap.end()){
-                            param.sigdata = &funcSigIt->second.back();
+                            if(funcSigIt != srctypedata.functionMap.end()){
+                                param.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
+                            }
                             std::vector<DeclData> paramdatavec = {param};
                             srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameOfIdentifier, paramdatavec));
                         }else{
