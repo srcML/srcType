@@ -54,14 +54,18 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 //can't have side effect on class members
                 if(ctx.currentToken == "="){
                     for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
-                        it->hasSideEffect = true;
                         if(it->isParameter){
+                            it->hasSideEffect = true;
                             if((it->isPointer || it->isReference) && !it->isConstAlias){
                                 currentSig->at(0).hasSideEffect = true;    
                             }
                         }else{
                             if(it->isClassMember){
-                                currentSig->at(0).hasSideEffect = true;
+                                //if the function is const, then there cannot be a side effect on members
+                                if(!currentSig->at(0).isConst){
+                                    currentSig->at(0).hasSideEffect = true;
+                                    it->hasSideEffect = true;
+                                }
                             }
 
                         }

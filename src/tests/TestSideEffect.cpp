@@ -88,6 +88,9 @@ class TestSideEffect : public srcSAXEventDispatch::PolicyDispatcher, public srcS
 			if(id.name == "barfoo2"){
 				assert(id.hasSideEffect == true);
 			}
+			if(id.name == "barfoo3"){
+				assert(id.hasSideEffect == false);
+			}
 		}
     protected:
         void * DataInner() const override {
@@ -102,6 +105,7 @@ int main(int argc, char** filename){
 		int x;\n\
 		Foo y;\n\
 		Obj blee;\n\
+		Obj blee2;\n\
 		std::string foo(int i, double j, const obj* r, Object q){\n\
 			object y2 = x;\n\
 			r = 0;\n\
@@ -114,6 +118,7 @@ int main(int argc, char** filename){
 			return y;\n\
 		}\n\
 		Object barfoo2(){blee = 3;}\n\
+		Object barfoo3()const{blee2 = 3; return blee2;}\n\
 	};\n\
     int foo2(int ab) const{return ab;}\n\
     int bar(int pop){pop = 0; return pop;}\n\
