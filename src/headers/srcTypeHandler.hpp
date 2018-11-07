@@ -26,6 +26,7 @@
 #include <DeclTypePolicy.hpp>
 #include <srcSAXEventDispatcher.hpp>
 #include <FunctionSignaturePolicy.hpp>
+#include <typeinfo>
 namespace srcTypeNS{
     struct srcTypeData{
         std::unordered_map<std::string, std::vector<DeclData>> paramMap;
@@ -45,7 +46,7 @@ namespace srcTypeNS{
     
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
                 using namespace srcSAXEventDispatch;
-                if(ctx.IsOpen(ParserState::declstmt)){
+                if(typeid(FunctionSignaturePolicy) != typeid(*policy)){
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
@@ -59,7 +60,7 @@ namespace srcTypeNS{
                     }else{
                         declCheck->second.push_back(decldata);
                     }
-                }else if(ctx.IsClosed(ParserState::declstmt)){
+                }else{
                     //Grab data
                     functionsigdata = *policy->Data<SignatureData>();
 
@@ -120,6 +121,12 @@ namespace srcTypeNS{
                 openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
                     ctx.dispatcher->AddListenerDispatch(&functionpolicy);
                 };
+                openEventMap[ParserState::constructor] = [this](srcSAXEventContext& ctx){
+                    ctx.dispatcher->AddListenerDispatch(&functionpolicy);
+                };
+                openEventMap[ParserState::destructor] = [this](srcSAXEventContext& ctx){
+                    ctx.dispatcher->AddListenerDispatch(&functionpolicy);
+                };
                 openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                     ctx.dispatcher->AddListenerDispatch(&declpolicy);
                 };
@@ -132,6 +139,7 @@ namespace srcTypeNS{
                 closeEventMap[ParserState::function] = [this](srcSAXEventContext& ctx){
                     funcSigIt = srctypedata.functionMap.end();
                 };
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){};
                 //closeEventMap[ParserState::classn] = [this](srcSAXEventContext& ctx){};
             }
     };

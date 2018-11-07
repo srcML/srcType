@@ -22,6 +22,7 @@
 #include <srcml.h>
 #include <cassert>
 #include <stdexcept>
+
 /// <summary>
 /// Utility function that trims from the right of a string. For now it's just solving a weird issue with srcML
 /// and garbage text ending up at the end of the cstring it returns.
@@ -384,9 +385,9 @@ int main(int argc, char** argv){
     TestUnresolved();
     TestWritableFind();
     //TestNamespacedTypedefedType();
-    //srcTypeNS::srcType typeDict;
-    //typeDict.ReadArchiveFile(argv[1]);
+    srcTypeNS::srcType typeDict;
+    typeDict.ReadArchiveFile(argv[1]);
     
     //typeDict.SerializeMap(SerializeToCppUMap);
-    //std::cerr<<typeDict.size();
+    std::cerr<<typeDict.data.paramMap.size();
 }

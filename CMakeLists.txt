@@ -26,8 +26,6 @@ project(srcType)
 # find needed libraries
 find_package(LibXml2 REQUIRED)
 
-
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 set(CMAKE_CXX_FLAGS "-std=c++0x -O3")
 
 # set output directory for binaries and libraries
