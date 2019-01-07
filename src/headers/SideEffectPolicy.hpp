@@ -36,6 +36,7 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
         }
         int numParams;
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
     protected:
         void * DataInner() const override {return (void*)0;}
     private:
