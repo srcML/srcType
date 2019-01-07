@@ -54,10 +54,8 @@ namespace srcTypeNS{
                 InitializeEventHandlers();
             }
     
-            void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
-                using namespace srcSAXEventDispatch;
-              
-            }
+            void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
+            void NotifyWrite(const PolicyDispatcher *policy, srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
         protected:
             void *DataInner() const override {
                 return new std::list<srcTypeInferenceData>(data);

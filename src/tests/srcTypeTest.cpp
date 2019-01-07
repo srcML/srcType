@@ -385,9 +385,9 @@ int main(int argc, char** argv){
     TestUnresolved();
     TestWritableFind();
     //TestNamespacedTypedefedType();
-    srcTypeNS::srcType typeDict;
-    typeDict.ReadArchiveFile(argv[1]);
+    //srcTypeNS::srcType typeDict;
+    //typeDict.ReadArchiveFile(argv[1]);
     
     //typeDict.SerializeMap(SerializeToCppUMap);
-    std::cerr<<typeDict.data.paramMap.size();
+    //std::cerr<<typeDict.data.paramMap.size();
 }

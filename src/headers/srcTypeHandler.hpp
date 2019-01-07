@@ -43,7 +43,7 @@ namespace srcTypeNS{
                 functionpolicy.AddListener(this);
                 funcSigIt = srctypedata.functionMap.end();
             }
-    
+            void NotifyWrite(const PolicyDispatcher *policy, srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
                 using namespace srcSAXEventDispatch;
                 if(typeid(FunctionSignaturePolicy) != typeid(*policy)){
