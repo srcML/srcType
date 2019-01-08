@@ -53,9 +53,10 @@ namespace srcTypeNS{
             srcTypeInferencePolicy(srcType* const data, std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners), dictionary(data), archiveBuffer(nullptr){
                 InitializeEventHandlers();
             }
-    
-            void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
             void NotifyWrite(const PolicyDispatcher *policy, srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
+            void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
+                using namespace srcSAXEventDispatch;
+            }
         protected:
             void *DataInner() const override {
                 return new std::list<srcTypeInferenceData>(data);

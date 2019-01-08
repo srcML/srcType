@@ -24,7 +24,7 @@
 #include <srcSAXHandler.hpp>
 #include <srcTypeProfile.hpp>
 #include <DeclTypePolicy.hpp>
-#include <srcSAXEventDispatcher.hpp>
+#include <srcSAXSingleEventDispatcher.hpp>
 #include <FunctionSignaturePolicy.hpp>
 #include <typeinfo>
 namespace srcTypeNS{
@@ -90,7 +90,6 @@ namespace srcTypeNS{
                         }
                         paramhash += param.nameOfIdentifier;
                     }
-                    
                 }
             }
             srcTypeData GetDictionary()const {

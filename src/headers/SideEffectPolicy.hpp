@@ -23,6 +23,7 @@
 #include <set>
 #include <vector>
 #include <srcType.hpp>
+#include <iostream>
 #ifndef SIDEEFFECTPOLICY
 #define SIDEEFFECTPOLICY
 class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
@@ -36,7 +37,7 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
         }
         int numParams;
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
+        void NotifyWrite(const PolicyDispatcher *policy, srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
     protected:
         void * DataInner() const override {return (void*)0;}
     private:
@@ -47,6 +48,7 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
+                if(!currentDecl) return;
                 for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
                     it->hasSideEffect = true;
                 }
@@ -54,6 +56,7 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 //can't have side effect on class members
                 if(ctx.currentToken == "="){
+                    if(!currentDecl || !currentSig) return;
                     for(std::vector<DeclData>::iterator it = currentDecl->begin(); it!= currentDecl->end(); ++it){
                         if(it->isParameter){
                             it->hasSideEffect = true;
@@ -63,10 +66,10 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                         }else{
                             if(it->isClassMember){
                                 //if the function is const, then there cannot be a side effect on members
-                                if(!currentSig->at(0).isConst){
-                                    currentSig->at(0).hasSideEffect = true;
-                                    it->hasSideEffect = true;
-                                }
+                                 if(!currentSig->at(0).isConst){
+                                     currentSig->at(0).hasSideEffect = true;
+                                     it->hasSideEffect = true;
+                                 }
                             }
 
                         }
@@ -75,9 +78,14 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
             };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
+            
                 if(ctx.Or({ParserState::exprstmt, ParserState::declstmt}) && ctx.Nor({ParserState::type, ParserState::call})){
                     std::string currentName = currentExprName.empty() ? currentDeclName : currentExprName;
-                    currentDecl = dictionary->FindIdentifierWrite(currentName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    try{
+                        currentDecl = dictionary->FindIdentifierWrite(currentName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    }catch(std::runtime_error e){
+                        currentDecl = nullptr;
+                    }
                     if(!currentDecl || currentDecl->empty()){
                         currentDecl = dictionary->FindIdentifierWrite(currentName, "", ctx.currentClassName, ctx.currentFilePath);
                     }
@@ -87,16 +95,23 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
 
                 //Can't return something with side effect
                 if(ctx.IsOpen(ParserState::returnstmt)){
-                    currentDecl = dictionary->FindIdentifierWrite(ctx.currentToken, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    try{
+                        currentDecl = dictionary->FindIdentifierWrite(ctx.currentToken, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    }catch(std::runtime_error e){
+                        currentDecl = nullptr;
+                    }
                     if(!currentDecl || currentDecl->empty()){
                         currentDecl = dictionary->FindIdentifierWrite(ctx.currentToken, "", ctx.currentClassName, ctx.currentFilePath);
                     }
+                    if(!currentDecl) return;
                     for(auto declit = currentDecl->begin(); declit != currentDecl->end(); ++declit){
                         if(declit->hasSideEffect){
+                            if(!currentSig) return;
                             currentSig->at(0).hasSideEffect = true;
                         }
                     }
                 }
+            
             };
 
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
@@ -117,11 +132,19 @@ class SideEffectPolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 }
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
-                ++numParams;
-                currentDecl = dictionary->FindIdentifierWrite(currentDeclName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                try{
+                    currentDecl = dictionary->FindIdentifierWrite(currentDeclName, ctx.currentFunctionName, "", ctx.currentFilePath);
+                    ++numParams;
+                }catch(std::runtime_error e){
+                    currentDecl = nullptr;
+                }
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx){
-                currentSig = dictionary->FindFunctionWrite(ctx.currentFunctionName, numParams);
+                try{
+                    currentSig = dictionary->FindFunctionWrite(ctx.currentFunctionName, numParams);
+                }catch(std::runtime_error e){
+                    currentSig = nullptr;
+                }
                 numParams = 0;
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
