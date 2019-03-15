@@ -26,31 +26,47 @@
 #include <unordered_map>
 #include <unordered_set>
 namespace srcTypeNS{    
-    enum PrimTypes{INT, UINT, SIINT, SHINT, SISINT, USISINT, LINT, SLINT, USILINT, SILINT, LDOUBLE, WCHAR, CHAR, UCHAR, SCHAR, VOID, FLOAT, BOOL, DOUBLE, SIZE_T};
+    enum PrimTypes{INT, UINT, SIINT, SHINT, SISINT, USISINT, LINT, SLINT, USILINT, SILINT, LDOUBLE, WCHAR, CHAR, UCHAR, SCHAR, VOID, FLOAT, BOOL, DOUBLE, SIZE_T, BYTE};
     enum VarCategory {primitive=0, userdefined=1};
     
     static const std::unordered_map<std::string, PrimTypes> cppPrimTypes{
-    {"int", INT},
-    {"unsigned int", UINT},
-    {"signed int", SIINT},
-    {"short int", SHINT},
-    {"signed short int", SISINT},
-    {"unsigned short int", USISINT},
-    {"long int", LINT},
-    {"signed long int", SILINT},
-    {"unsigned long int", USILINT},
-    {"float", FLOAT},
-    {"double", DOUBLE},
-    {"long double", LDOUBLE},
-    {"wchar_t", WCHAR},
-    {"char", CHAR},
-    {"unsigned char", UCHAR},
-    {"signed char", SCHAR},
-    {"void", VOID},
-    {"float", FLOAT},
-    {"bool", BOOL},
-    {"double", DOUBLE},
-    {"size_t", SIZE_T}};
+        {"int", INT},
+        {"unsigned int", UINT},
+        {"signed int", SIINT},
+        {"short int", SHINT},
+        {"signed short int", SISINT},
+        {"unsigned short int", USISINT},
+        {"long int", LINT},
+        {"signed long int", SILINT},
+        {"unsigned long int", USILINT},
+        {"float", FLOAT},
+        {"double", DOUBLE},
+        {"long double", LDOUBLE},
+        {"wchar_t", WCHAR},
+        {"char", CHAR},
+        {"unsigned char", UCHAR},
+        {"signed char", SCHAR},
+        {"void", VOID},
+        {"float", FLOAT},
+        {"bool", BOOL},
+        {"boolean", BOOL},
+        {"double", DOUBLE},
+        {"size_t", SIZE_T},
+        {"long", LINT},
+        {"short", SHINT},
+        {"byte", BYTE},
+        {"intValue", INT},
+        {"longValue", LINT},
+        {"floatValue", FLOAT},
+        {"doubleValue", DOUBLE},
+        {"byteValue", BYTE},
+        {"shortValue", SHINT},
+        {"AtomicInteger", INT},
+        {"AtomicLong", LINT},
+        {"BigDecimal", FLOAT},
+        {"BigInteger", INT},
+        {"Integer", INT}
+    };
 };
     static const std::unordered_set<std::string> numberConversionTypes{
     "int",
