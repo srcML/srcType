@@ -58,6 +58,24 @@ namespace srcTypeNS{
                     return nullptr;
                 }
             }
+            //Allows side effects
+            std::vector<DeclData>* FindParameterWrite(std::string varName, std::string functionName){
+                auto paramit = data.paramMap.find(functionName + varName);
+                if (paramit != data.paramMap.end()){
+                    return &(paramit->second);
+                }else{
+                    return nullptr;
+                }
+            }
+            //Allows side effects
+            std::vector<DeclData>* FindVariableWrite(std::string varName, std::string functionName, std::string classname, std::string fileName){
+                auto varit = data.variableMap.find(fileName + functionName + classname + varName);
+                if (varit != data.variableMap.end()){
+                    return &(varit->second);
+                }else{
+                    return nullptr;
+                }
+            }
 
             std::vector<DeclData> FindIdentifier(std::string varName, std::string functionName, std::string classname, std::string fileName) const{
                 auto varit = data.variableMap.find(fileName + functionName + classname + varName);
