@@ -59,8 +59,8 @@ namespace srcTypeNS{
                 }
             }
             //Allows side effects
-            std::vector<DeclData>* FindParameterWrite(std::string varName, std::string functionName){
-                auto paramit = data.paramMap.find(functionName + varName);
+            std::vector<DeclData>* FindParameterWrite(std::string varName, unsigned int lineNumber){
+                auto paramit = data.paramMap.find(varName + std::to_string(lineNumber));
                 if (paramit != data.paramMap.end()){
                     return &(paramit->second);
                 }else{
@@ -68,8 +68,8 @@ namespace srcTypeNS{
                 }
             }
             //Allows side effects
-            std::vector<DeclData>* FindVariableWrite(std::string varName, std::string functionName, std::string classname, std::string fileName){
-                auto varit = data.variableMap.find(fileName + functionName + classname + varName);
+            std::vector<DeclData>* FindVariableWrite(std::string varName, unsigned int lineNumber){
+                auto varit = data.variableMap.find(varName + std::to_string(lineNumber));
                 if (varit != data.variableMap.end()){
                     return &(varit->second);
                 }else{

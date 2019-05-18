@@ -56,7 +56,7 @@ namespace srcTypeNS{
                             decldata.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
                         }
                         std::vector<DeclData> decldatavec = {decldata};
-                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
+                        srctypedata.variableMap.insert(std::make_pair(decldata.nameOfIdentifier+std::to_string(ctx.currentLineNumber), decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
                     }
@@ -68,7 +68,7 @@ namespace srcTypeNS{
                     auto functionCheck = srctypedata.functionMap.find(functionsigdata.name);
                     if(functionCheck == srctypedata.functionMap.end()){
                         std::vector<SignatureData> functionsigdatavec = {functionsigdata};
-                        funcSigIt = srctypedata.functionMap.insert(std::make_pair(functionsigdata.name, functionsigdatavec)).first;
+                        funcSigIt = srctypedata.functionMap.insert(std::make_pair(functionsigdata.name+std::to_string(ctx.currentLineNumber), functionsigdatavec)).first;
                     }else{
                         funcSigIt = functionCheck;
                         functionCheck->second.push_back(functionsigdata);
@@ -84,7 +84,7 @@ namespace srcTypeNS{
                                 param.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
                             }
                             std::vector<DeclData> paramdatavec = {param};
-                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameOfIdentifier, paramdatavec));
+                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + std::to_string(ctx.currentLineNumber), paramdatavec));
                         }else{
                             paramCheck->second.push_back(param);
                         }
