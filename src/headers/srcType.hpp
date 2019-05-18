@@ -137,8 +137,8 @@ namespace srcTypeNS{
                 }
                 return std::vector<SignatureData>();
             }
-            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
-                auto it = data.functionMap.find(funcName);
+            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, unsigned int lineNumber) {
+                auto it = data.functionMap.find(funcName + std::to_string(lineNumber));
                 if(it != data.functionMap.end()){
                     return &(it->second);
                 }else{
