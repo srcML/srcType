@@ -26,6 +26,9 @@
 #include <iostream>
 
 namespace srcTypeNS{
+    inline bool IsPrimitive(std::string type){
+        return cppPrimTypes.find(type) != cppPrimTypes.end();
+    }
     class srcType{
         public:
             unsigned int currentline;
@@ -38,9 +41,6 @@ namespace srcTypeNS{
             srcType(FILE*, const bool);
             srcType(int, const bool);
             void ReadArchiveFile(std::string);
-            bool IsPrimitive(std::string type){
-                return cppPrimTypes.find(type) != cppPrimTypes.end();
-            }
             bool SetContext(std::string file, std::string function){
                 currentfilename = file;
                 currentfunctionname = function;
