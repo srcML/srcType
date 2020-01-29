@@ -64,7 +64,8 @@ namespace srcTypeNS{
         {"atomiclong", LINT},
         {"bigdecimal", FLOAT},
         {"biginteger", INT},
-        {"integer", INT}
+        {"integer", INT},
+        {"character", CHAR}
     };
 };
     static const std::unordered_set<std::string> numberConversionTypes{
