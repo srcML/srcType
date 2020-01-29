@@ -54,17 +54,17 @@ namespace srcTypeNS{
         {"long", LINT},
         {"short", SHINT},
         {"byte", BYTE},
-        {"intValue", INT},
-        {"longValue", LINT},
-        {"floatValue", FLOAT},
-        {"doubleValue", DOUBLE},
-        {"byteValue", BYTE},
-        {"shortValue", SHINT},
-        {"AtomicInteger", INT},
-        {"AtomicLong", LINT},
-        {"BigDecimal", FLOAT},
-        {"BigInteger", INT},
-        {"Integer", INT}
+        {"intvalue", INT},
+        {"longvalue", LINT},
+        {"floatvalue", FLOAT},
+        {"doublevalue", DOUBLE},
+        {"bytevalue", BYTE},
+        {"shortvalue", SHINT},
+        {"atomicinteger", INT},
+        {"atomiclong", LINT},
+        {"bigdecimal", FLOAT},
+        {"biginteger", INT},
+        {"integer", INT}
     };
 };
     static const std::unordered_set<std::string> numberConversionTypes{
