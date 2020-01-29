@@ -46,7 +46,7 @@ namespace srcTypeNS{
             void NotifyWrite(const PolicyDispatcher *policy, srcSAXEventDispatch::srcSAXEventContext &ctx) override {}
             void Notify(const PolicyDispatcher *policy, const srcSAXEventDispatch::srcSAXEventContext &ctx) override {
                 using namespace srcSAXEventDispatch;
-                if(typeid(FunctionSignaturePolicy) != typeid(*policy)){
+                if(typeid(DeclTypePolicy) == typeid(*policy)){
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
@@ -60,7 +60,7 @@ namespace srcTypeNS{
                     }else{
                         declCheck->second.push_back(decldata);
                     }
-                }else{
+                }else if(typeid(FunctionSignaturePolicy) == typeid(*policy)){
                     //Grab data
                     functionsigdata = *policy->Data<SignatureData>();
 
@@ -90,6 +90,8 @@ namespace srcTypeNS{
                         }
                         paramhash += param.nameOfIdentifier;
                     }
+                }else{
+                    std::cerr<<"error"<<std::endl;
                 }
             }
             srcTypeData GetDictionary()const {

@@ -39,6 +39,9 @@ namespace srcTypeNS{
             srcType(int, const bool);
             void ReadArchiveFile(std::string);
             bool IsPrimitive(std::string type){
+                std::for_each(type.begin(), type.end(), [](char & c){
+                	c = ::tolower(c);
+                });
                 return cppPrimTypes.find(type) != cppPrimTypes.end();
             }
             bool SetContext(std::string file, std::string function){

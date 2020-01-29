@@ -23,26 +23,12 @@
 #include <cassert>
 #include <stdexcept>
 
-/// <summary>
-/// Utility function that trims from the right of a string. For now it's just solving a weird issue with srcML
-/// and garbage text ending up at the end of the cstring it returns.
-/// </summary>
-inline char* TrimFromEnd(char *s, size_t len){
-    for (int i = len - 1; i > 0; --i){
-        if (s[i] != '>'){
-            s[i] = 0;
-        }else{
-            return s;
-        }
-    }
-    return nullptr;
-}
 std::string StringToSrcML(std::string str){
     struct srcml_archive* archive;
     struct srcml_unit* unit;
     size_t size = 0;
 
-    char *ch = new char[str.size()];
+    char *ch = 0;
 
     archive = srcml_archive_create();
     srcml_archive_enable_option(archive, SRCML_OPTION_POSITION);
@@ -58,7 +44,7 @@ std::string StringToSrcML(std::string str){
     srcml_unit_free(unit);
     srcml_archive_close(archive);
     srcml_archive_free(archive);
-    TrimFromEnd(ch, size);
+
     return std::string(ch);
 }
 void TestPrimitiveTypes(){
@@ -69,27 +55,23 @@ void TestPrimitiveTypes(){
         typeDict.SetContext("testsrcType.cpp", "main");
         {
             auto nameprofile = typeDict.FindVariable("c");
-            std::cerr<<"Type1: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "int");
             assert(typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
         }
         {
             auto nameprofile = typeDict.FindVariable("v");
-            std::cerr<<"Type2: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "int");
             assert(typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
             assert(nameprofile.front().isConstValue);
         }
         {
             auto nameprofile = typeDict.FindVariable("e");
-            std::cerr<<"Type3: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "int"); 
             assert(typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
             assert(nameprofile.front().isConstValue);
         }
         {
             auto nameprofile = typeDict.FindVariable("array");
-            std::cerr<<"Type4: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "char");
             assert(typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
             //assert(nameprofile.front().isArray);
@@ -109,20 +91,17 @@ void TestComplexType(){
         typeDict.SetContext("testsrcType.cpp", "main");    
         {
             auto nameprofile = typeDict.FindVariable("coo");
-            std::cerr<<"Type1: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false);
         }
         {
             auto nameprofile = typeDict.FindVariable("ke_e4e");
-            std::cerr<<"Type2: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false
                    && nameprofile.front().isConstValue);
         }
         {
             auto nameprofile = typeDict.FindVariable("caa34");
-            std::cerr<<"Type3: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false
                    && nameprofile.front().isConstValue);
@@ -142,21 +121,18 @@ void TestPrimitiveTypesMultiDecl(){
         typeDict.SetContext("testsrcType.cpp", "main"); 
         {
             auto nameprofile = typeDict.FindVariable("c");
-            std::cerr<<"Type1: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfIdentifier == "c"
                    && nameprofile.front().nameOfType == "int"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
         }
         {
             auto nameprofile = typeDict.FindVariable("v");
-            std::cerr<<"Type2: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfIdentifier == "v"
                    && nameprofile.front().nameOfType == "int"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
         }
         {
             auto nameprofile = typeDict.FindVariable("e");
-            std::cerr<<"Type3: "<< nameprofile.front().nameOfType <<std::endl;
             assert(nameprofile.front().nameOfIdentifier == "e"
                    && nameprofile.front().nameOfType == "int"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == true);
@@ -182,7 +158,6 @@ void TestNamespacedComplexType(){
         }
         {
             auto nameprofile = typeDict.FindVariable("ke_e4e");
-            std::cerr<<"Type2: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false
                    && nameprofile.front().isConstValue
@@ -190,7 +165,6 @@ void TestNamespacedComplexType(){
         }
         {
             auto nameprofile = typeDict.FindVariable("caa34", "Foo", "testsrcType.cpp");
-            std::cerr<<"Type3: "<< nameprofile.front().nameOfType<<std::endl;
             assert(nameprofile.front().nameOfType == "Object"
                    && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false
                    && nameprofile.front().isConstValue
