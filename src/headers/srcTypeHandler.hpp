@@ -50,13 +50,13 @@ namespace srcTypeNS{
                     //Grab data
                     decldata = *policy->Data<DeclData>();
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                    auto declCheck = srctypedata.variableMap.find(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier);
+                    auto declCheck = srctypedata.variableMap.find(decldata.nameOfIdentifier + std::to_string(decldata.lineNumber));
                     if(declCheck == srctypedata.variableMap.end()){
                         if(funcSigIt != srctypedata.functionMap.end()){
                             decldata.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
                         }
                         std::vector<DeclData> decldatavec = {decldata};
-                        srctypedata.variableMap.insert(std::make_pair(ctx.currentFilePath + functionsigdata.name + decldata.nameOfContainingClass + decldata.nameOfIdentifier, decldatavec));
+                        srctypedata.variableMap.insert(std::make_pair(decldata.nameOfIdentifier+std::to_string(decldata.lineNumber), decldatavec));
                     }else{
                         declCheck->second.push_back(decldata);
                     }
@@ -67,8 +67,10 @@ namespace srcTypeNS{
                     //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
                     auto functionCheck = srctypedata.functionMap.find(functionsigdata.name);
                     if(functionCheck == srctypedata.functionMap.end()){
-                        std::vector<SignatureData> functionsigdatavec = {functionsigdata};
-                        funcSigIt = srctypedata.functionMap.insert(std::make_pair(functionsigdata.name, functionsigdatavec)).first;
+                        if(!functionsigdata.name.empty()){
+                            std::vector<SignatureData> functionsigdatavec = {functionsigdata};
+                            funcSigIt = srctypedata.functionMap.insert(std::make_pair(functionsigdata.name+std::to_string(functionsigdata.lineNumber), functionsigdatavec)).first;
+                        }
                     }else{
                         funcSigIt = functionCheck;
                         functionCheck->second.push_back(functionsigdata);
@@ -78,13 +80,13 @@ namespace srcTypeNS{
                     
                     for(auto param : functionsigdata.parameters){
                         //If we have seen it before, add it to currently existing entry. Otherwise, make a new one.
-                        auto paramCheck = srctypedata.paramMap.find(functionsigdata.name + param.nameOfIdentifier);
+                        auto paramCheck = srctypedata.paramMap.find(param.nameOfIdentifier + std::to_string(param.lineNumber));
                         if(paramCheck == srctypedata.paramMap.end()){
                             if(funcSigIt != srctypedata.functionMap.end()){
                                 param.numOfContainingFunctionParams = funcSigIt->second.at(0).parameters.size();
                             }
                             std::vector<DeclData> paramdatavec = {param};
-                            srctypedata.paramMap.insert(std::make_pair(functionsigdata.name + param.nameOfIdentifier, paramdatavec));
+                            srctypedata.paramMap.insert(std::make_pair(param.nameOfIdentifier + std::to_string(param.lineNumber), paramdatavec));
                         }else{
                             paramCheck->second.push_back(param);
                         }

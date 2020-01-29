@@ -26,6 +26,9 @@
 #include <iostream>
 
 namespace srcTypeNS{
+    inline bool IsPrimitive(std::string type){
+        return cppPrimTypes.find(type) != cppPrimTypes.end();
+    }
     class srcType{
         public:
             unsigned int currentline;
@@ -57,6 +60,24 @@ namespace srcTypeNS{
                     return &(varit->second);
                 }else if (paramit != data.paramMap.end()){
                     return &(paramit->second);
+                }else{
+                    return nullptr;
+                }
+            }
+            //Allows side effects
+            std::vector<DeclData>* FindParameterWrite(std::string varName, unsigned int lineNumber){
+                auto paramit = data.paramMap.find(varName + std::to_string(lineNumber));
+                if (paramit != data.paramMap.end()){
+                    return &(paramit->second);
+                }else{
+                    return nullptr;
+                }
+            }
+            //Allows side effects
+            std::vector<DeclData>* FindVariableWrite(std::string varName, unsigned int lineNumber){
+                auto varit = data.variableMap.find(varName + std::to_string(lineNumber));
+                if (varit != data.variableMap.end()){
+                    return &(varit->second);
                 }else{
                     return nullptr;
                 }
@@ -122,8 +143,8 @@ namespace srcTypeNS{
                 }
                 return std::vector<SignatureData>();
             }
-            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, int numParams) {
-                auto it = data.functionMap.find(funcName);
+            std::vector<SignatureData>* FindFunctionWrite(std::string funcName, unsigned int lineNumber) {
+                auto it = data.functionMap.find(funcName + std::to_string(lineNumber));
                 if(it != data.functionMap.end()){
                     return &(it->second);
                 }else{

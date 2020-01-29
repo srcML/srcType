@@ -30,17 +30,17 @@ int main(int argc, char** argv){
 		auto nameprofile = typeDict.FindVariable("coo");
 		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
 		assert(nameprofile.front().nameOfType == "Object" 
-				&& typeDict.IsPrimitive(nameprofile.front().nameOfType) == false 
+				&& srcTypeNS::IsPrimitive(nameprofile.front().nameOfType) == false 
 				&& nameprofile.front().namespaces.front() == "std");
 	}
 	{
 		auto nameprofile = typeDict.FindVariable("ke_e4e");
 		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
-	    assert(nameprofile.front().nameOfType == "Object" && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConstValue && nameprofile.front().namespaces.front() == "std");
+	    assert(nameprofile.front().nameOfType == "Object" && srcTypeNS::IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConstValue && nameprofile.front().namespaces.front() == "std");
 	}
 	{
 		auto nameprofile = typeDict.FindVariable("caa34");
 		std::cerr<<"Name: "<<nameprofile.front().nameOfIdentifier<<" Type: "<< nameprofile.front().nameOfType<<std::endl;
-		assert(nameprofile.front().nameOfType == "Object" && typeDict.IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConstValue && nameprofile.front().namespaces.front() == "std");
+		assert(nameprofile.front().nameOfType == "Object" && srcTypeNS::IsPrimitive(nameprofile.front().nameOfType) == false && nameprofile.front().isConstValue && nameprofile.front().namespaces.front() == "std");
 	}
 }
